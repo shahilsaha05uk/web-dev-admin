@@ -1,0 +1,11 @@
+#root {
+	padding: 1rem;
+}
+
+body {
+	background-color: #191919;
+}
+
+.pac-container {
+	z-index: 100000;
+}
