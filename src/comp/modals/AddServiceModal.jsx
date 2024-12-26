@@ -1,37 +1,30 @@
+import { useRef } from "react";
 import { Box, Modal, Stack } from "@mui/material";
-import { ComponentStyles } from "../../assets/compStyles";
-import AddForm from "../forms/AddForm";
-import PanelButton from "../PanelButton";
-import { useEffect, useRef } from "react";
-import DGTable from "../tables/DGTable";
-import { TableData } from "../../utils/consts/tableConsts";
-import usePostRestaurantDetails from "../../utils/externalUtils/posters/usePostRestaurantDetails";
-import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
-import {
-	setRecords,
-	setRowSelectionConfig,
-	setRowToEdit,
-} from "../../states/slc_addModal";
+import DGTable from "../tables/DGTable";
+import PanelButton from "../PanelButton";
+import AddServiceForm from "../forms/AddServiceForm";
+import { ComponentStyles } from "../../assets/compStyles";
 import { GetAPIFromTableRef } from "../../utils/tableUtils";
+import { setRecords, setRowToEdit } from "../../states/slc_serviceModal";
+import { ServiceSchema } from "../../utils/consts/schema/service_schema";
+import usePostServiceDetails from "../../utils/externalUtils/posters/usePostServiceDetails";
 
-export default function AddModal({ open, onClose }) {
+export default function AddServiceModal({ open, onClose }) {
 	// This stores all the data in the table
 	const tableRef = useRef(null);
 
-	const records = useSelector((state) => state.addModal.records);
+	const records = useSelector((state) => state.addServiceModal.records);
 	const rowSelectionConfig = useSelector(
-		(state) => state.addModal.rowSelectionConfig
+		(state) => state.addServiceModal.rowSelectionConfig
 	);
-	const rowToEdit = useSelector((state) => state.addModal.rowToEdit);
+	const rowToEdit = useSelector((state) => state.addServiceModal.rowToEdit);
 
 	const dispatch = useDispatch();
 
-	//const [data, setData] = useState([]);
-	const { mutate } = usePostRestaurantDetails();
+	const { mutate } = usePostServiceDetails();
 
 	const onAddButtonClick = (record) => {
-		record.id = nanoid();
 		dispatch(setRecords([record, ...records]));
 	};
 
@@ -103,10 +96,6 @@ export default function AddModal({ open, onClose }) {
 		}
 	};
 
-	useEffect(() => {
-		dispatch(setRowSelectionConfig(rowsSelectionData));
-	}, [rowsSelectionData, dispatch]);
-
 	return (
 		<Modal
 			open={open}
@@ -120,13 +109,13 @@ export default function AddModal({ open, onClose }) {
 					{/* The table component */}
 					<DGTable
 						ref={tableRef}
-						cols={TableData.modalRestaurantTable}
+						cols={ServiceSchema.modal}
 						rows={records}
 						rowSelection={rowSelectionConfig}
 						onRowClicked={handleOnRowClicked}
 					/>
 					{/* The form to handle all the fields in the form */}
-					<AddForm
+					<AddServiceForm
 						onAdd={onAddButtonClick}
 						onSave={onSaveButtonClick}
 						onCancel={onCancelUpdateButtonClick}
@@ -151,12 +140,4 @@ const ModalStyles = {
 		justifyContent: "flex-end",
 		gap: 1,
 	},
-};
-
-const rowsSelectionData = {
-	mode: "singleRow",
-	enableClickSelection: true,
-	enableSelectionWithoutKeys: true,
-	checkboxes: false,
-	headerCheckbox: false,
 };

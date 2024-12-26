@@ -8,8 +8,9 @@ import Review from "./panels/Review";
 import { ComponentStyles } from "../assets/compStyles";
 import Users from "./panels/User";
 import Services from "./panels/Services";
+import Addon from "./panels/Addon";
 
-const navNum = 1;
+const navNum = 2;
 
 const styles = {
 	panel: {
@@ -24,7 +25,7 @@ function OpenPanel(props) {
 	} else if (value === 1) {
 		return <Services />;
 	} else if (value === 2) {
-		return <Review />;
+		return <Addon />;
 	} else if (value === 3) {
 		return <Users />;
 	}

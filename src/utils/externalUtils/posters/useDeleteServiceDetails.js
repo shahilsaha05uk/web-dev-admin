@@ -2,16 +2,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postData } from "../routerUtils/post";
 import { api_routes } from "../routes";
 
-export default function usePostRestaurantDetails() {
+export default function useDeleteServiceDetails() {
 	const queryClient = useQueryClient();
 
 	// Define the mutation
 	const mutation = useMutation({
-		mutationFn: async (records) => {
-			await postData(api_routes.postRestaurants, records);
+		mutationFn: async (record) => {
+			await postData(api_routes.deleteService, record);
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries(["allRestaurants"]); // Properly invalidate the query
+			queryClient.invalidateQueries(["allServices"]); // Properly invalidate the query
 		},
 	});
 

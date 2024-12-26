@@ -1,11 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const addModalSlice = createSlice({
-	name: "addModal",
+const serviceSlice = createSlice({
+	name: "service",
 	initialState: {
 		records: [],
-		rowSelectionConfig: {},
-		rowToEdit: null,
+		rowSelectionConfig: {
+			mode: "singleRow",
+			enableClickSelection: true,
+			enableSelectionWithoutKeys: true,
+			checkboxes: true,
+			headerCheckbox: false,
+		},
 		selectedRowCount: 0,
 	},
 	reducers: {
@@ -19,17 +24,9 @@ const addModalSlice = createSlice({
 		setSelectedRowCount: (state, action) => {
 			state.selectedRowCount = action.payload;
 		},
-		setRowToEdit: (state, action) => {
-			state.rowToEdit = action.payload;
-			console.log(action.payload);
-		},
 	},
 });
 
-export const addModalReducer = addModalSlice.reducer;
-export const {
-	setRecords,
-	setRowSelectionConfig,
-	setSelectedRowCount,
-	setRowToEdit,
-} = addModalSlice.actions;
+export const serviceReducer = serviceSlice.reducer;
+export const { setRecords, setRowSelectionConfig, setSelectedRowCount } =
+	serviceSlice.actions;

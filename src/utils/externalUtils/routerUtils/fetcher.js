@@ -11,6 +11,20 @@ export async function fetchData(route) {
 		return null; // Return an empty array if there's an error
 	}
 }
+//================================================================================================
+// Database routes
+export async function fetchAllServices() {
+	const response = await fetchData(api_routes.allServices);
+	return response.data;
+}
+
+export async function fetchAllAddons() {
+	const response = await fetchData(api_routes.allAddons);
+	return response.data;
+}
+
+// ======================================== Obsolete ========================================
+
 export async function fetchAllUserDetails() {
 	const response = await fetchData(api_routes.allUsers);
 	return response.data;
@@ -34,11 +48,5 @@ export async function fetchAllSortedRestaurants(order) {
 }
 export async function fetchAllPendingReviews() {
 	const response = await fetchData(api_routes.allPendingReviews);
-	return response.data;
-}
-//================================================================================================
-// Database routes
-export async function fetchAllServices() {
-	const response = await fetchData(api_routes.allServices);
 	return response.data;
 }

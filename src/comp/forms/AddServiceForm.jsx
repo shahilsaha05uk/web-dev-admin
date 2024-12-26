@@ -9,18 +9,17 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { nanoid } from "nanoid";
 
-export default function AddForm(props) {
+export default function AddServiceForm(props) {
 	// form hooks
 	const methods = useForm();
 
-	const rowToEdit = useSelector((state) => state.addModal.rowToEdit);
+	const rowToEdit = useSelector((state) => state.addServiceModal.rowToEdit);
 
 	// Props
 	const { onAdd, onCancel, onUpdate, onDelete } = props;
 	const { handleSubmit, setValue, reset } = methods;
 
 	// States
-	const [location, setLocation] = useState(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [buttonDisabled, setButtonDisabled] = useState({
 		add: false,
@@ -32,7 +31,6 @@ export default function AddForm(props) {
 	// Handlers
 	// This function calls the onAdd method from the props passed and resets the form fields for another entry
 	const handleAdd = (data) => {
-		data.id = nanoid();
 		if (onAdd) onAdd(data);
 		reset();
 	};
@@ -77,7 +75,7 @@ export default function AddForm(props) {
 	// This function sets the location field in the form
 	const OnLocationSet = (location) => {
 		setLocation(location);
-		setValue("postcode", location.address);
+		setValue("service_city", location.address);
 	};
 
 	return (
@@ -85,15 +83,19 @@ export default function AddForm(props) {
 			<Box sx={ComponentStyles.modal.form.main}>
 				<Box sx={ComponentStyles.modal.form.content}>
 					{/* Form Fields */}
-					<FormInputText name="name" label="Restaurant name" />
-					<FormInputText name="city" label="City" />
+					<FormInputText name="service_name" label="Service name" />
+					<FormInputText
+						name="service_cost"
+						label="Price in £0.00"
+						type="number"
+					/>
 					<LocationField
-						name="postcode"
-						label="Postcode"
+						name="service_city"
+						label="City"
 						onPlaceSelect={OnLocationSet}
 						isFormField={true}
 					/>
-					<FormInputText name="description" label="Description" />
+					<FormInputText name="service_description" label="Description" />
 
 					{/* Buttons */}
 					<Box sx={Styles.btnBox}>

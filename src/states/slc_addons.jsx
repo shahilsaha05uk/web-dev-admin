@@ -1,10 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const restaurantSlice = createSlice({
-	name: "restaurant",
+const addonSlice = createSlice({
+	name: "addon",
 	initialState: {
 		records: [],
-		rowSelectionConfig: {},
+		rowSelectionConfig: {
+			mode: "singleRow",
+			enableClickSelection: true,
+			enableSelectionWithoutKeys: true,
+			checkboxes: true,
+			headerCheckbox: false,
+		},
 		selectedRowCount: 0,
 	},
 	reducers: {
@@ -21,6 +27,6 @@ const restaurantSlice = createSlice({
 	},
 });
 
-export const restaurantReducer = restaurantSlice.reducer;
+export const addonReducer = addonSlice.reducer;
 export const { setRecords, setRowSelectionConfig, setSelectedRowCount } =
-	restaurantSlice.actions;
+	addonSlice.actions;

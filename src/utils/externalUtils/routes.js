@@ -23,24 +23,30 @@ export const page_routes = {
 
 export const api_routes = {
 	// sorted restaurant data
-	ascSortedSearch: "/api/restaurants/asc",
-	descSortedSearch: "/api/restaurants/desc",
+	ascSortedSearch: "/api/service/asc",
+	descSortedSearch: "/api/service/desc",
 
 	// fetchers
-	allServices: "/api/services/all",
 
 	// search by city or restaurant
 	searchBy: "/api/searchby",
 
-	// post data
-	postService: "/api/restaurants/add",
-
 	// update data
-	updateService: "/api/restaurants/update",
-
-	// delete data
-	deleteService: "/api/restaurants/delete",
+	updateService: "/api/service/update",
 
 	// login data
 	postLoginDetails: "/api/auth",
+
+	// ========================
+	// db routes
+	// ========================
+	// service data
+	allServices: "/api/db/service/all",
+	addService: "/api/db/service/add",
+	deleteService: "/api/db/service/delete",
+
+	// addon data
+	allAddons: "/api/db/addon/all",
+	addAddon: "/api/db/addon/add",
+	deleteAddon: "/api/db/addon/delete",
 };

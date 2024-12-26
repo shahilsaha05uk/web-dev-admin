@@ -14,6 +14,7 @@ export async function post(route, data) {
 export async function postData(route, data) {
 	try {
 		const response = await post(route, { data });
+		console.log("Response:", response);
 		return response.data;
 	} catch (error) {
 		console.error("Error posting data:", error);

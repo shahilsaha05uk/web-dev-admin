@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import BasePanel from "./BasePanel";
 import PanelButton from "../PanelButton";
 import { ComponentStyles } from "../../assets/compStyles";
-import { useFetchAllServices } from "../../utils/externalUtils/fetchers/useFetchAllServices";
 import { useState } from "react";
 import { Box } from "@mui/material";
 import DGTable from "../tables/DGTable";
@@ -19,25 +18,24 @@ import {
 	setRecords,
 	setRowSelectionConfig,
 	setSelectedRowCount,
-} from "../../states/slc_services";
-import { ServiceSchema } from "../../utils/consts/schema/service_schema";
-import useDeleteServiceDetails from "../../utils/externalUtils/posters/useDeleteServiceDetails";
-import AddServiceModal from "../modals/AddServiceModal";
+} from "../../states/slc_addons";
+import { AddonSchema } from "../../utils/consts/schema/addon_schema";
+import { useFetchAllAddons } from "../../utils/externalUtils/fetchers/useFetchAllAddons";
+import useDeleteAddonDetails from "../../utils/externalUtils/posters/useDeleteAddonDetails";
+import AddAddonModal from "../modals/AddAddonModal";
 
-export default function Services() {
+export default function Addon() {
 	const rowSelectionConfig = useSelector(
-		(state) => state.service.rowSelectionConfig
+		(state) => state.addon.rowSelectionConfig
 	);
-	const records = useSelector((state) => state.service.records);
-	const selectedRowCount = useSelector(
-		(state) => state.service.selectedRowCount
-	);
+	const records = useSelector((state) => state.addon.records);
+	const selectedRowCount = useSelector((state) => state.addon.selectedRowCount);
 	const dispatch = useDispatch();
 
 	const tableRef = useRef(null);
 	const [currentModal, setCurrentModal] = useState(null);
-	const { data, isLoading, isError, error } = useFetchAllServices();
-	const { mutate } = useDeleteServiceDetails();
+	const { data, isLoading, isError, error } = useFetchAllAddons();
+	const { mutate } = useDeleteAddonDetails();
 
 	const handleOnMultiSelectButtonClick = () => {
 		resetSelection();
@@ -107,7 +105,7 @@ export default function Services() {
 	return (
 		<BasePanel>
 			<div>
-				<h1>Services</h1>
+				<h1>Addons</h1>
 				{/* Buttons to open modals */}
 				<PanelButton
 					label="Add"
@@ -143,7 +141,7 @@ export default function Services() {
 				<Box sx={ComponentStyles.pageTable}>
 					<DGTable
 						ref={tableRef}
-						cols={ServiceSchema.main}
+						cols={AddonSchema.main}
 						rows={records}
 						pagination
 						paginationPageSizeSelector={[10, 20, 30, 100]}
@@ -156,7 +154,7 @@ export default function Services() {
 
 				{/* Modals */}
 				{currentModal === "add" && (
-					<AddServiceModal open onClose={() => handleOnModalClose()} />
+					<AddAddonModal open onClose={() => handleOnModalClose()} />
 				)}
 				{currentModal === "update" && (
 					<UpdateModal

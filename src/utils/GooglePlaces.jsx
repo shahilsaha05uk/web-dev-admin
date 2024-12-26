@@ -15,6 +15,7 @@ export const GooglePlaces = forwardRef(
 
 			// this defines all the fields to fetch from the place
 			const options = {
+				//types: ["(cities)"],
 				fields: ["geometry", "formatted_address"],
 			};
 
