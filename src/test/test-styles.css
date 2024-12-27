@@ -1,18 +1,21 @@
 body {
-	font: normal 14px/100% "Andale Mono", AndaleMono, monospace;
-	color: #fff;
+    font:
+        normal 14px/100% "Andale Mono",
+        AndaleMono,
+        monospace;
+    color: #fff;
 
-	background-color: #374954;
-	text-align: center;
+    background-color: #374954;
+    text-align: center;
 }
 
 h1 {
-	font-size: 20px;
-	margin-bottom: 10px;
+    font-size: 20px;
+    margin-bottom: 10px;
 }
 
 .container {
-	margin: 60% auto;
+    margin: 60% auto;
 }
 
 /* button {
