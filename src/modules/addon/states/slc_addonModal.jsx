@@ -1,15 +1,20 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const addonModalSlice = createSlice({
-    name: "addonModal",
+    name: 'addonModal',
     initialState: {
         records: [],
         rowSelectionConfig: {
-            mode: "singleRow",
-            enableClickSelection: true,
-            enableSelectionWithoutKeys: true,
-            checkboxes: false,
-            headerCheckbox: false,
+            // enableClickSelection: true,
+            // enableSelectionWithoutKeys: true,
+            // checkboxes: false,
+            // headerCheckbox: false,
+            // editable: true,
+
+            mode: 'singleRow',
+            flex: 1,
+            editable: true,
+            suppressCellFocus: true,
         },
         rowToEdit: null,
         selectedRowCount: 0,
@@ -33,9 +38,4 @@ const addonModalSlice = createSlice({
 });
 
 export const addonModalReducer = addonModalSlice.reducer;
-export const {
-    setRecords,
-    setRowSelectionConfig,
-    setSelectedRowCount,
-    setRowToEdit,
-} = addonModalSlice.actions;
+export const { setRecords, setRowSelectionConfig, setSelectedRowCount, setRowToEdit } = addonModalSlice.actions;

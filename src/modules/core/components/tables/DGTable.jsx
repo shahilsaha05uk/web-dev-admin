@@ -1,8 +1,8 @@
-import { ComponentStyles } from "assets/compStyles";
-import { AgGridReact } from "ag-grid-react";
-import { Box } from "@mui/material";
-import { useTableThemeMemo } from "core/memos/table/useThemeMemo";
-import { useColumnMemo } from "core/memos/table/useColumnMemo";
+import { ComponentStyles } from 'assets/compStyles';
+import { AgGridReact } from 'ag-grid-react';
+import { Box } from '@mui/material';
+import { useTableThemeMemo } from 'core/memos/table/useThemeMemo';
+import { useColumnMemo } from 'core/memos/table/useColumnMemo';
 
 export default function DGTable({ cols, rows, ...props }) {
     const themeMemo = useTableThemeMemo(); // Cache the theme

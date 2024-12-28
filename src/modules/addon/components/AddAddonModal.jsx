@@ -1,36 +1,36 @@
-import { Box, Modal, Stack } from "@mui/material";
-import { ComponentStyles } from "assets/compStyles";
-import PanelButton from "core_components/buttons/PanelButton";
-import { useRef } from "react";
-import DGTable from "core_components/tables/DGTable";
-import { useDispatch, useSelector } from "react-redux";
-import { setRecords } from "addon/states/slc_addons";
-import { GetAPIFromTableRef } from "helper/table_helper";
-import usePostServiceDetails from "api/post/usePostServiceDetails";
-import { AddonSchema } from "addon/schema/addon_schema";
+import { Box, Modal, Stack } from '@mui/material';
+import { ComponentStyles } from 'assets/compStyles';
+import PanelButton from 'core_components/buttons/PanelButton';
+import { useRef } from 'react';
+import DGTable from 'core_components/tables/DGTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { setRecords } from 'addon/states/slc_addons';
+import { AddRow, GetAPIFromTableRef } from 'helper/table_helper';
+import usePostServiceDetails from 'modules/services/hooks/usePostServiceDetails';
+import { AddonSchema } from 'addon/schema/addon_schema';
+import { useCallback } from 'react';
+
+import ServiceList from './ServiceList';
 
 export default function AddAddonModal({ open, onClose }) {
     // This stores all the data in the table
     const tableRef = useRef(null);
 
     const records = useSelector((state) => state.addonModal.records);
-    const rowSelectionConfig = useSelector(
-        (state) => state.addonModal.rowSelectionConfig,
-    );
+    const rowSelectionConfig = useSelector((state) => state.addonModal.rowSelectionConfig);
     const rowToEdit = useSelector((state) => state.addonModal.rowToEdit);
 
     const dispatch = useDispatch();
 
-    const { mutate } = usePostServiceDetails();
+    // const { mutate } = usePostServiceDetails();
+    // const { data } = useFetchAllServiceIDs();
 
     const onAddButtonClick = (record) => {
         dispatch(setRecords([record, ...records]));
     };
 
     const onDeleteButtonClick = () => {
-        const newRecords = records.filter(
-            (record) => record.id !== rowToEdit.data.id,
-        );
+        const newRecords = records.filter((record) => record.id !== rowToEdit.data.id);
         dispatch(setRecords(newRecords));
         resetSelection();
     };
@@ -68,16 +68,28 @@ export default function AddAddonModal({ open, onClose }) {
     };
 
     const handleOnRowClicked = (event) => {
-        const { rowIndex, data } = event;
+        // const { rowIndex, data } = event;
+        // if (!rowToEdit) {
+        //     dispatch(setRowToEdit({ rowIndex, data }));
+        // } else {
+        //     if (rowToEdit.rowIndex === rowIndex) {
+        //         resetSelection();
+        //     } else {
+        //         dispatch(setRowToEdit({ rowIndex, data }));
+        //     }
+        // }
 
-        if (!rowToEdit) {
-            dispatch(setRowToEdit({ rowIndex, data }));
+        const gridApi = GetAPIFromTableRef(tableRef);
+
+        const fCell = gridApi.getFocusedCell();
+        if (fCell) {
+            console.log(fCell);
         } else {
-            if (rowToEdit.rowIndex === rowIndex) {
-                resetSelection();
-            } else {
-                dispatch(setRowToEdit({ rowIndex, data }));
-            }
+            console.log('NO Cell is focussed');
+        }
+
+        if (gridApi) {
+            gridApi.clearFocusedCell();
         }
     };
 
@@ -96,8 +108,36 @@ export default function AddAddonModal({ open, onClose }) {
     };
 
     const onAddRow = () => {
-        dispatch(setRecords([...records, {}]));
+        // This is where the data needs to be updated in the table
+        AddRow(tableRef, []);
     };
+
+    const onCellEditingStarted = useCallback((event) => {
+        console.log('cellEditingStarted');
+        const gridApi = GetAPIFromTableRef(tableRef);
+
+        const fCell = gridApi.getFocusedCell();
+        if (fCell) {
+            console.log(fCell);
+        } else {
+            console.log('NO Cell is focussed');
+        }
+
+        if (gridApi) {
+            gridApi.clearFocusedCell();
+        }
+    }, []);
+
+    const onCellEditingStopped = useCallback((event) => {
+        console.log('cellEditingStopped');
+
+        console.log('cellEditingStarted');
+        const gridApi = GetAPIFromTableRef(tableRef);
+
+        if (gridApi) {
+            gridApi.clearFocusedCell();
+        }
+    }, []);
 
     return (
         <Modal
@@ -110,22 +150,25 @@ export default function AddAddonModal({ open, onClose }) {
                 <PanelButton label="Add Row +" onClick={onAddRow} />
                 {/* The content of the modal */}
                 <Box sx={ComponentStyles.modal.content}>
+                    <ServiceList />
                     {/* The table component */}
                     <DGTable
+                        sx={ModalStyles.table}
                         ref={tableRef}
                         cols={AddonSchema.modal}
                         rows={records}
+                        stopEditingWhenCellsLoseFocus={true}
+                        singleClickEdit={true}
                         rowSelection={rowSelectionConfig}
                         onRowClicked={handleOnRowClicked}
+                        onCellEditingStarted={onCellEditingStarted}
+                        onCellEditingStopped={onCellEditingStopped}
                     />
                 </Box>
 
                 {/* Stack to hold the Save button and the Cancel Button */}
                 <Stack direction="row" sx={ModalStyles.btnStack}>
-                    <PanelButton
-                        label="Save Changes"
-                        onClick={onSaveButtonClick}
-                    />
+                    <PanelButton label="Save Changes" onClick={onSaveButtonClick} />
                     <PanelButton label="Close" onClick={handleOnClose} />
                 </Stack>
             </Box>
@@ -135,7 +178,7 @@ export default function AddAddonModal({ open, onClose }) {
 
 const ModalStyles = {
     btnStack: {
-        justifyContent: "flex-end",
+        justifyContent: 'flex-end',
         gap: 1,
     },
 };

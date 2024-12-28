@@ -1,13 +1,13 @@
-import axios from "axios";
-import { api_routes } from "api/routes.js";
-import { getURL } from "api/getURL.js";
+import axios from 'axios';
+import { api_routes } from 'api/routes.js';
+import { getURL } from 'api/getURL.js';
 
 export async function fetchData(route) {
     try {
         const response = await axios.get(getURL(route));
         return response.data; // Return the list directly
     } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         return null; // Return an empty array if there's an error
     }
 }
@@ -15,6 +15,11 @@ export async function fetchData(route) {
 // Database routes
 export async function fetchAllServices() {
     const response = await fetchData(api_routes.allServices);
+    return response.data;
+}
+
+export async function fetchAllServiceIDs() {
+    const response = await fetchData(api_routes.allServiceIDs);
     return response.data;
 }
 
@@ -31,7 +36,7 @@ export async function fetchAllUserDetails() {
 }
 
 export async function fetchSearchByData(type) {
-    const response = await fetchData(api_routes.searchBy + "/" + type);
+    const response = await fetchData(api_routes.searchBy + '/' + type);
     return response.data;
 }
 
@@ -41,10 +46,7 @@ export async function fetchAllCities() {
 }
 
 export async function fetchAllSortedRestaurants(order) {
-    const route =
-        order === "asc"
-            ? api_routes.ascSortedSearch
-            : api_routes.descSortedSearch;
+    const route = order === 'asc' ? api_routes.ascSortedSearch : api_routes.descSortedSearch;
     const response = await fetchData(route);
     return response.data;
 }

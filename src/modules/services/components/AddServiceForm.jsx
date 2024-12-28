@@ -1,38 +1,34 @@
-import * as React from "react";
-import { Box } from "@mui/material";
-import { ComponentStyles } from "assets/compStyles";
-import { FormProvider, useForm } from "react-hook-form";
-import LocationField from "core_components/fields/LocationField";
-import { FormInputText } from "core_components/form/FormInputText";
-import PanelButton from "core_components/buttons/PanelButton";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { nanoid } from "nanoid";
+import * as React from 'react';
+import { Box } from '@mui/material';
+import { ComponentStyles } from 'assets/compStyles';
+import { FormProvider, useForm } from 'react-hook-form';
+import LocationField from 'core_components/fields/LocationField';
+import { FormInputText } from 'core_components/form/FormInputText';
+import PanelButton from 'core_components/buttons/PanelButton';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { nanoid } from 'nanoid';
 
 export default function AddServiceForm(props) {
     // form hooks
     const methods = useForm();
-
     const rowToEdit = useSelector((state) => state.addServiceModal.rowToEdit);
 
     // Props
     const { onAdd, onCancel, onUpdate, onDelete } = props;
+
     const { handleSubmit, setValue, reset } = methods;
 
     // States
     const [isEditing, setIsEditing] = useState(false);
-    const [buttonDisabled, setButtonDisabled] = useState({
-        add: false,
-        edit: true,
-        cancel: true,
-        update: true,
-    });
+    const [location, setLocation] = useState(false);
 
     // Handlers
     // This function calls the onAdd method from the props passed and resets the form fields for another entry
     const handleAdd = (data) => {
         if (onAdd) onAdd(data);
-        reset();
+        console.log(data);
+        resetEverything();
     };
 
     // This function will populate the form fields with the data from the row that was clicked and enable the cancel and update button
@@ -46,20 +42,20 @@ export default function AddServiceForm(props) {
             setIsEditing(true);
         } else {
             // Reset form to empty when editRow is null
-            reset();
+            resetEverything();
             setIsEditing(false);
         }
     };
 
     const handleDelete = () => {
         if (onDelete) onDelete(rowToEdit);
-        reset();
+        resetEverything();
     };
 
     // This function calls the onUpdate method from the props passed and resets the form fields for another entry
     const handleUpdate = (data) => {
         if (onUpdate) onUpdate(data);
-        reset();
+        resetEverything();
     };
 
     // This function resets the form fields and disables the cancel and update button
@@ -72,10 +68,15 @@ export default function AddServiceForm(props) {
         if (onCancel) onCancel();
     };
 
+    const resetEverything = () => {
+        reset();
+        setIsEditing(false);
+    };
+
     // This function sets the location field in the form
     const OnLocationSet = (location) => {
         setLocation(location);
-        setValue("service_city", location.address);
+        setValue('service_city', location.address);
     };
 
     return (
@@ -84,30 +85,13 @@ export default function AddServiceForm(props) {
                 <Box sx={ComponentStyles.modal.form.content}>
                     {/* Form Fields */}
                     <FormInputText name="service_name" label="Service name" />
-                    <FormInputText
-                        name="service_cost"
-                        label="Price in £0.00"
-                        type="number"
-                    />
-                    <LocationField
-                        name="service_city"
-                        label="City"
-                        onPlaceSelect={OnLocationSet}
-                        isFormField={true}
-                    />
-                    <FormInputText
-                        name="service_description"
-                        label="Description"
-                    />
+                    <FormInputText name="service_cost" label="Price in £0.00" type="number" defaultValue={0} />
+                    <LocationField name="service_city" label="City" onPlaceSelect={OnLocationSet} isFormField={true} />
+                    <FormInputText name="service_description" label="Description" />
 
                     {/* Buttons */}
                     <Box sx={Styles.btnBox}>
-                        <PanelButton
-                            name="add"
-                            label="Add"
-                            onClick={handleSubmit(handleAdd)}
-                            disabled={rowToEdit}
-                        />
+                        <PanelButton name="add" label="Add" onClick={handleSubmit(handleAdd)} disabled={rowToEdit} />
                         <Box sx={Styles.updateBox} pointerEvents="none">
                             <PanelButton
                                 name="edit"
@@ -151,16 +135,16 @@ export default function AddServiceForm(props) {
 
 const Styles = {
     btnBox: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         gap: 2,
     },
     updateBox: {
-        display: "inline-flex",
-        alignItems: "stretch",
-        flexDirection: "row",
-        justifyContent: "stretch",
+        display: 'inline-flex',
+        alignItems: 'stretch',
+        flexDirection: 'row',
+        justifyContent: 'stretch',
         gap: 2,
     },
 };

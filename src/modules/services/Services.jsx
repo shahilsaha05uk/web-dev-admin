@@ -1,36 +1,27 @@
-import React, { useEffect } from "react";
-import BasePanel from "core_components/panels/BasePanel";
-import PanelButton from "core_components/buttons/PanelButton";
-import { ComponentStyles } from "assets/compStyles";
-import { useFetchAllServices } from "api/fetch/useFetchAllServices";
-import { useState } from "react";
-import { Box } from "@mui/material";
-import DGTable from "core_components/tables/DGTable";
-import LoadingRadial from "core_components/misc/LoadingRadial";
-import ErrorScreen from "core_components/misc/ErrorScreen";
-import { useRef } from "react";
-import {
-    GetAPIFromTableRef,
-    GetSelectedRowsFromTableRef,
-} from "helper/table_helper";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    setRecords,
-    setRowSelectionConfig,
-    setSelectedRowCount,
-} from "services/states/slc_services";
-import { ServiceSchema } from "services/schema/service_schema";
-import useDeleteServiceDetails from "api/post/useDeleteServiceDetails";
-import AddServiceModal from "services/components/AddServiceModal";
+import React, { useEffect } from 'react';
+import BasePanel from 'core_components/panels/BasePanel';
+import PanelButton from 'core_components/buttons/PanelButton';
+import { ComponentStyles } from 'assets/compStyles';
+import { useFetchAllServices } from 'api/fetch/useFetchAllServices';
+import { useState } from 'react';
+import { Box } from '@mui/material';
+import DGTable from 'core_components/tables/DGTable';
+import LoadingRadial from 'core_components/misc/LoadingRadial';
+import ErrorScreen from 'core_components/misc/ErrorScreen';
+import { useRef } from 'react';
+import { DeleteSelectedRow, GetAPIFromTableRef, GetSelectedRowsFromTableRef, RefreshTable } from 'helper/table_helper';
+import { useDispatch, useSelector } from 'react-redux';
+import { setRowSelectionConfig, setSelectedRowCount } from 'services/states/slc_services';
+import { ServiceSchema } from 'services/schema/service_schema';
+import AddServiceModal from 'services/components/AddServiceModal';
+import { AddRows } from 'helper/table_helper';
+import useDeleteServiceDetails from './hooks/useDeleteServiceDetails';
+import { GetPermanentIDsFromSelectedRows } from './utils/serviceHelper';
 
 export default function Services() {
-    const rowSelectionConfig = useSelector(
-        (state) => state.service.rowSelectionConfig,
-    );
+    const rowSelectionConfig = useSelector((state) => state.service.rowSelectionConfig);
     const records = useSelector((state) => state.service.records);
-    const selectedRowCount = useSelector(
-        (state) => state.service.selectedRowCount,
-    );
+    const selectedRowCount = useSelector((state) => state.service.selectedRowCount);
     const dispatch = useDispatch();
 
     const tableRef = useRef(null);
@@ -43,7 +34,7 @@ export default function Services() {
         dispatch(
             setRowSelectionConfig({
                 ...rowSelectionConfig,
-                mode: "multiRow",
+                mode: 'multiRow',
             }),
         );
     };
@@ -54,17 +45,17 @@ export default function Services() {
         dispatch(
             setRowSelectionConfig({
                 ...rowSelectionConfig,
-                mode: "singleRow",
+                mode: 'singleRow',
             }),
         );
     };
 
     const handleOnDeleteButtonClick = () => {
-        const selectedRows = GetSelectedRowsFromTableRef(tableRef);
-        if (selectedRows && selectedRows.length > 0) {
-            const ids = selectedRows.map((row) => row.id);
-            console.log("Deleting rows with IDs:", ids);
+        const ids = GetPermanentIDsFromSelectedRows(tableRef);
+        DeleteSelectedRow(tableRef);
 
+        if (ids.length > 0) {
+            console.log('Deleting rows with IDs:', ids);
             mutate(ids); // Pass only IDs to the delete mutation
             resetSelection(); // Clear selection after deletion
         }
@@ -78,7 +69,7 @@ export default function Services() {
             gridApi.deselectAll();
         }
 
-        console.log("Selection count:", selectedRowCount);
+        console.log('Selection count:', selectedRowCount);
     };
 
     const handleOnModalClose = () => {
@@ -92,13 +83,23 @@ export default function Services() {
             const count = gridApi.getSelectedRows().length;
             dispatch(setSelectedRowCount(count));
         }
+    };
 
-        console.log("Selection count:", selectedRowCount);
+    const handleOnTableReady = () => {
+        AddRows(tableRef, data);
+    };
+
+    const handleOnModalOpen = (modal) => {
+        resetSelection();
+        dispatch(setRowSelectionConfig({ ...rowSelectionConfig, mode: 'singleRow' }));
+        setCurrentModal(modal);
     };
 
     useEffect(() => {
-        dispatch(setRecords(data));
-    }, [data, dispatch]);
+        if (data && tableRef) {
+            RefreshTable(tableRef, data);
+        }
+    }, [data, tableRef]);
 
     if (isLoading) return <LoadingRadial />;
     if (isError) return <ErrorScreen error={error} />;
@@ -108,14 +109,10 @@ export default function Services() {
             <div>
                 <h1>Services</h1>
                 {/* Buttons to open modals */}
-                <PanelButton
-                    label="Add"
-                    onClick={() => setCurrentModal("add")}
-                    sx={ComponentStyles.panelButton}
-                />
+                <PanelButton label="Add" onClick={() => handleOnModalOpen('add')} sx={ComponentStyles.panelButton} />
                 <PanelButton
                     label="Update"
-                    onClick={() => setCurrentModal("update")}
+                    onClick={() => handleOnModalOpen('update')}
                     sx={ComponentStyles.panelButton}
                     disabled={selectedRowCount !== 1}
                 />
@@ -123,13 +120,13 @@ export default function Services() {
                     label="Multi-Select"
                     onClick={handleOnMultiSelectButtonClick}
                     sx={ComponentStyles.panelButton}
-                    disabled={rowSelectionConfig.mode === "multiRow"}
+                    disabled={rowSelectionConfig.mode === 'multiRow'}
                 />
                 <PanelButton
                     label="Cancel Multi-Select"
                     onClick={handleOnCancelMultiSelectButtonClick}
                     sx={ComponentStyles.panelButton}
-                    disabled={rowSelectionConfig.mode === "singleRow"}
+                    disabled={rowSelectionConfig.mode === 'singleRow'}
                 />
                 <PanelButton
                     label="Delete"
@@ -147,6 +144,7 @@ export default function Services() {
                         pagination
                         paginationPageSizeSelector={[10, 20, 30, 100]}
                         paginationPageSize={10}
+                        onGridReady={handleOnTableReady}
                         rowSelection={rowSelectionConfig}
                         onRowClicked={handleOnRowClicked}
                         onRowSelected={handleOnRowClicked}
@@ -154,20 +152,10 @@ export default function Services() {
                 </Box>
 
                 {/* Modals */}
-                {currentModal === "add" && (
-                    <AddServiceModal
-                        open
-                        onClose={() => handleOnModalClose()}
-                    />
+                {currentModal === 'add' && <AddServiceModal open onClose={() => handleOnModalClose()} />}
+                {currentModal === 'update' && (
+                    <Update open onClose={() => handleOnModalClose()} row={GetSelectedRowsFromTableRef(tableRef)} />
                 )}
-                {currentModal === "update" &&
-                    {
-                        /* <UpdateModal
-                        open
-                        onClose={() => handleOnModalClose()}
-                        row={GetSelectedRowsFromTableRef(tableRef)}
-                    /> */
-                    }}
             </div>
         </BasePanel>
     );

@@ -1,23 +1,26 @@
-import { useRef } from "react";
-import { Box, Modal, Stack } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import DGTable from "core_components/tables/DGTable";
-import PanelButton from "core_components/buttons/PanelButton";
-import AddServiceForm from "services/components/AddServiceForm";
-import { ComponentStyles } from "assets/compStyles";
-import { GetAPIFromTableRef, UpdateRow } from "helper/table_helper";
-import { setRecords, setRowToEdit } from "services/states/slc_serviceModal";
-import { ServiceSchema } from "services/schema/service_schema";
-import usePostServiceDetails from "api/post/usePostServiceDetails";
+import { useRef } from 'react';
+import { Box, Modal, Stack } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import DGTable from 'core_components/tables/DGTable';
+import PanelButton from 'core_components/buttons/PanelButton';
+import AddServiceForm from 'services/components/AddServiceForm';
+import { ComponentStyles } from 'assets/compStyles';
+import { setRecords, setRowToEdit } from 'services/states/slc_serviceModal';
+import { ServiceSchema } from 'services/schema/service_schema';
+import usePostServiceDetails from 'services/hooks/usePostServiceDetails';
+import { useState } from 'react';
+import { decrementCount, incrementCount } from '../states/slc_serviceModal';
+import { AddRow, DeleteSelectedRow, UpdateSelectedRow, GetAPIFromTableRef, GetRowData } from 'helper/table_helper';
+import { useCallback } from 'react';
 
 export default function AddServiceModal({ open, onClose }) {
     // This stores all the data in the table
     const tableRef = useRef(null);
+    const getRowId = useCallback((params) => String(params.data.table_id), []);
 
     const records = useSelector((state) => state.addServiceModal.records);
-    const rowSelectionConfig = useSelector(
-        (state) => state.addServiceModal.rowSelectionConfig,
-    );
+    const count = useSelector((state) => state.addServiceModal.recordCount);
+    const rowSelectionConfig = useSelector((state) => state.addServiceModal.rowSelectionConfig);
     const rowToEdit = useSelector((state) => state.addServiceModal.rowToEdit);
 
     const dispatch = useDispatch();
@@ -25,33 +28,29 @@ export default function AddServiceModal({ open, onClose }) {
     const { mutate } = usePostServiceDetails();
 
     const onAddButtonClick = (record) => {
-        dispatch(setRecords([record, ...records]));
+        dispatch(incrementCount());
+        record.table_id = count;
+        AddRow(tableRef, record);
     };
 
     const onDeleteButtonClick = () => {
-        const newRecords = records.filter(
-            (record) => record.id !== rowToEdit.data.id,
-        );
-        dispatch(setRecords(newRecords));
-
-        console.log(records.length);
-
+        DeleteSelectedRow(tableRef);
         resetSelection();
     };
 
     const onUpdateButtonClick = (data) => {
         console.log(data);
-        UpdateRow(tableRef, rowToEdit, data);
+        UpdateSelectedRow(tableRef, data);
         resetSelection();
     };
 
     const onCancelUpdateButtonClick = () => {
         resetSelection();
-        //if (onClose) onClose();
     };
 
     const onSaveButtonClick = () => {
-        mutate(records);
+        const data = GetRowData(tableRef);
+        mutate(data);
 
         resetEverything();
         if (onClose) onClose();
@@ -105,6 +104,7 @@ export default function AddServiceModal({ open, onClose }) {
                         ref={tableRef}
                         cols={ServiceSchema.modal}
                         rows={records}
+                        getRowId={getRowId}
                         rowSelection={rowSelectionConfig}
                         onRowClicked={handleOnRowClicked}
                     />
@@ -121,10 +121,7 @@ export default function AddServiceModal({ open, onClose }) {
 
                 {/* Stack to hold the Save button and the Cancel Button */}
                 <Stack direction="row" sx={ModalStyles.btnStack}>
-                    <PanelButton
-                        label="Save Changes"
-                        onClick={onSaveButtonClick}
-                    />
+                    <PanelButton label="Save Changes" onClick={onSaveButtonClick} />
                     <PanelButton label="Close" onClick={handleOnClose} />
                 </Stack>
             </Box>
@@ -134,7 +131,7 @@ export default function AddServiceModal({ open, onClose }) {
 
 const ModalStyles = {
     btnStack: {
-        justifyContent: "flex-end",
+        justifyContent: 'flex-end',
         gap: 1,
     },
 };
