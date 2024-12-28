@@ -41,7 +41,7 @@ export const api_routes = {
     // db routes
     // ========================
     // service data
-    allServiceIDs: '/api/db/pk/service/all',
+    allServiceIDs: '/api/db/service/pk/all',
     allServices: '/api/db/service/all',
     addService: '/api/db/service/add',
     deleteService: '/api/db/service/delete',

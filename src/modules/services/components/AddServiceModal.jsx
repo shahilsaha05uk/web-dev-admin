@@ -39,7 +39,6 @@ export default function AddServiceModal({ open, onClose }) {
     };
 
     const onUpdateButtonClick = (data) => {
-        console.log(data);
         UpdateSelectedRow(tableRef, data);
         resetSelection();
     };

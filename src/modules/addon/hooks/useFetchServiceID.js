@@ -3,7 +3,7 @@ import { fetchAllServiceIDs } from 'api/fetcher';
 
 export const useFetchAllServiceIDs = () => {
     const queryInfo = useQuery({
-        queryKey: ['allServices'],
+        queryKey: ['allServiceIDs'],
         queryFn: async () => await fetchAllServiceIDs(),
         refetchOnWindowFocus: false,
     });

@@ -1,3 +1,5 @@
+import DeleteButton from 'modules/core/components/buttons/DeleteButton';
+
 export const AddonSchema = {
     main: [
         {
@@ -47,6 +49,13 @@ export const AddonSchema = {
     ],
     modal: [
         {
+            field: 'table_id',
+            headerName: 'Table ID',
+            editable: false,
+            hide: false,
+            flex: 1,
+        },
+        {
             field: 'addon_id',
             headerName: 'Addon ID',
             editable: true,
@@ -58,6 +67,7 @@ export const AddonSchema = {
             headerName: 'Service ID',
             editable: true,
             flex: 1,
+            hide: true,
 
             cellEditor: 'agSelectCellEditor',
             cellEditorParams: {
@@ -75,7 +85,6 @@ export const AddonSchema = {
             headerName: 'Addon Description',
             editable: true,
             flex: 1,
-
             cellEditor: 'agLargeTextCellEditor',
             cellEditorPopup: true,
             cellEditorParams: {

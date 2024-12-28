@@ -27,7 +27,6 @@ export default function AddServiceForm(props) {
     // This function calls the onAdd method from the props passed and resets the form fields for another entry
     const handleAdd = (data) => {
         if (onAdd) onAdd(data);
-        console.log(data);
         resetEverything();
     };
 

@@ -1,5 +1,5 @@
-import { Button } from "@mui/material";
-import * as React from "react";
+import { Button } from '@mui/material';
+import * as React from 'react';
 
 export default function PanelButton({ label, ...props }) {
     return (
