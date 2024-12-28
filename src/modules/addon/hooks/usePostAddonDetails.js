@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postData } from 'api/post';
 import { api_routes } from 'api/routes';
 
-export default function usePostServiceDetails() {
+export default function usePostAddonDetails() {
     const queryClient = useQueryClient();
 
     // Define the mutation

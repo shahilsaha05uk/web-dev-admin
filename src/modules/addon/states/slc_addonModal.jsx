@@ -68,6 +68,9 @@ const addonModalSlice = createSlice({
                 [service_id]: records,
             };
         },
+        clearRecords: (state) => {
+            state.records = {};
+        },
         setRecords: (state, action) => {
             records = action.payload;
         },
@@ -91,6 +94,7 @@ export const {
     addRecords,
     updateRecord,
     deleteRecords,
+    clearRecords,
     setRecords,
     setRowSelectionConfig,
     setSelectedRowCount,

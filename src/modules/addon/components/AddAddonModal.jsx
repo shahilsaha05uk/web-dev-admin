@@ -10,7 +10,8 @@ import { DeleteSelectedRow, GetRowData } from 'helper/table_helper';
 import usePostServiceDetails from 'modules/services/hooks/usePostServiceDetails';
 import { AddonSchema } from 'addon/schema/addon_schema';
 import { isTheSameIndex } from '../utils/addon_helper';
-import { deleteRecords } from '../states/slc_addonModal';
+import { clearRecords, deleteRecords } from '../states/slc_addonModal';
+import usePostAddonDetails from '../hooks/usePostAddonDetails';
 
 export default function AddAddonModal({ open, onClose }) {
     // References and States
@@ -26,7 +27,7 @@ export default function AddAddonModal({ open, onClose }) {
     const dispatch = useDispatch();
 
     // Mutate API Hook
-    const { mutate } = usePostServiceDetails();
+    const { mutate } = usePostAddonDetails();
 
     // On Grid Ready Callback
     const onGridReady = (params) => setGridApi(params.api);
@@ -92,8 +93,6 @@ export default function AddAddonModal({ open, onClose }) {
                 gridApi.applyTransaction({ remove: selectedRows });
             }
         }
-
-        //DeleteSelectedRow(tableRef);
     };
 
     // Save Updated Cell Value
@@ -112,7 +111,7 @@ export default function AddAddonModal({ open, onClose }) {
     // Reset Everything
     const resetEverything = () => {
         resetSelection();
-        dispatch(setRecords({}));
+        dispatch(clearRecords());
     };
 
     const resetSelection = () => {
