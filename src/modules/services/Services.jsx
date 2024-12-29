@@ -17,6 +17,7 @@ import AddServiceModal from 'services/components/AddServiceModal';
 import { AddRows } from 'helper/table_helper';
 import useDeleteServiceDetails from './hooks/useDeleteServiceDetails';
 import { GetPermanentIDsFromSelectedRows } from './utils/serviceHelper';
+import UpdateServiceModal from './components/UpdateServiceModal';
 
 export default function Services() {
     const rowSelectionConfig = useSelector((state) => state.service.rowSelectionConfig);
@@ -26,9 +27,11 @@ export default function Services() {
 
     const tableRef = useRef(null);
     const [currentModal, setCurrentModal] = useState(null);
+    const [gridApi, setGridApi] = useState(null);
     const { data, isLoading, isError, error } = useFetchAllServices();
     const { mutate } = useDeleteServiceDetails();
 
+    // When the multi-select button is clicked, it will enable the multi-row selection mode
     const handleOnMultiSelectButtonClick = () => {
         resetSelection();
         dispatch(
@@ -39,6 +42,7 @@ export default function Services() {
         );
     };
 
+    // When the cancel multi-select button is clicked, it will reset the selection to single-row mode
     const handleOnCancelMultiSelectButtonClick = () => {
         resetSelection();
 
@@ -50,8 +54,9 @@ export default function Services() {
         );
     };
 
+    // When the delete button is clicked, it will delete the selected rows
     const handleOnDeleteButtonClick = () => {
-        const ids = GetPermanentIDsFromSelectedRows(tableRef);
+        const ids = GetPermanentIDsFromSelectedRows(gridApi);
         DeleteSelectedRow(tableRef);
 
         if (ids.length > 0) {
@@ -61,38 +66,43 @@ export default function Services() {
         }
     };
 
+    // Reset the selection count to 0
     const resetSelection = () => {
         dispatch(setSelectedRowCount(0));
 
-        const gridApi = GetAPIFromTableRef(tableRef);
         if (gridApi) {
             gridApi.deselectAll();
         }
-
-        console.log('Selection count:', selectedRowCount);
     };
 
     const handleOnModalClose = () => {
         setCurrentModal(null);
+        resetSelection();
     };
 
     const handleOnRowClicked = () => {
-        const gridApi = GetAPIFromTableRef(tableRef);
-
         if (gridApi) {
             const count = gridApi.getSelectedRows().length;
             dispatch(setSelectedRowCount(count));
         }
     };
 
-    const handleOnTableReady = () => {
+    const handleOnGridReady = (params) => {
         AddRows(tableRef, data);
+        setGridApi(params.api);
     };
 
     const handleOnModalOpen = (modal) => {
-        resetSelection();
         dispatch(setRowSelectionConfig({ ...rowSelectionConfig, mode: 'singleRow' }));
         setCurrentModal(modal);
+    };
+
+    const getSelectedRows = () => {
+        if (gridApi) {
+            const selectedRows = gridApi.getSelectedRows();
+            console.log('Selected Rows:', selectedRows);
+            return selectedRows;
+        }
     };
 
     useEffect(() => {
@@ -144,7 +154,7 @@ export default function Services() {
                         pagination
                         paginationPageSizeSelector={[10, 20, 30, 100]}
                         paginationPageSize={10}
-                        onGridReady={handleOnTableReady}
+                        onGridReady={handleOnGridReady}
                         rowSelection={rowSelectionConfig}
                         onRowClicked={handleOnRowClicked}
                         onRowSelected={handleOnRowClicked}
@@ -154,7 +164,7 @@ export default function Services() {
                 {/* Modals */}
                 {currentModal === 'add' && <AddServiceModal open onClose={() => handleOnModalClose()} />}
                 {currentModal === 'update' && (
-                    <Update open onClose={() => handleOnModalClose()} row={GetSelectedRowsFromTableRef(tableRef)} />
+                    <UpdateServiceModal open onClose={() => handleOnModalClose()} row={getSelectedRows()} />
                 )}
             </div>
         </BasePanel>

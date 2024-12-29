@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
 import { ComponentStyles } from 'assets/compStyles';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import LocationField from 'core_components/fields/LocationField';
 import { useState, useEffect } from 'react';
 import { FormInputText } from 'core_components/form/FormInputText';
 
 export default function UpdateServiceForm(props) {
-    const methods = useForm();
+    const methods = useFormContext();
 
     const { setValue, reset } = methods;
     const [location, setLocation] = useState(null);
@@ -33,15 +33,13 @@ export default function UpdateServiceForm(props) {
 
     return (
         <Box sx={ComponentStyles.modal.form.main}>
-            <FormProvider {...methods}>
-                <Box sx={ComponentStyles.modal.form.content}>
-                    {/* Form Fields */}
-                    <FormInputText name="service_name" label="Restaurant name" />
-                    <FormInputText name="service_cost" label="Cost" />
-                    <LocationField name="service_city" label="City" onPlaceSelect={OnLocationSet} isFormField={true} />
-                    <FormInputText name="service_description" label="Description" />
-                </Box>
-            </FormProvider>
+            <Box sx={ComponentStyles.modal.form.content}>
+                {/* Form Fields */}
+                <FormInputText name="service_name" label="Service name" />
+                <FormInputText name="service_cost" label="Cost" />
+                <LocationField name="service_city" label="City" onPlaceSelect={OnLocationSet} isFormField={true} />
+                <FormInputText name="service_description" label="Description" />
+            </Box>
         </Box>
     );
 }

@@ -5,12 +5,12 @@ import { FormProvider, useForm } from 'react-hook-form';
 import PanelButton from 'core_components/buttons/PanelButton';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import UpdateServiceForm from './UpdateServiceForm';
-import useUpdateServiceDetails from '../hooks/useUpdateServiceDetails';
+import useUpdateAddonDetails from '../hooks/useUpdateAddonDetails';
+import UpdateAddonForm from './UpdateAddonForm';
 
-export default function UpdateServiceModal({ open, onClose, row }) {
+export default function UpdateAddonModal({ open, onClose, row }) {
     const methods = useForm();
-    const { mutate } = useUpdateServiceDetails();
+    const { mutate } = useUpdateAddonDetails();
     const [record, setRecord] = useState(null);
 
     const { handleSubmit } = methods;
@@ -23,7 +23,8 @@ export default function UpdateServiceModal({ open, onClose, row }) {
     }, [row, setRecord]);
 
     const onSave = (data) => {
-        data.service_id = record.service_id;
+        data.addon_id = record.addon_id;
+        console.log('data', data);
         mutate(data);
         onClose();
     };
@@ -43,7 +44,7 @@ export default function UpdateServiceModal({ open, onClose, row }) {
                 <Box sx={ComponentStyles.modal.content}>
                     {/* The form to handle all the fields in the form */}
                     <FormProvider {...methods}>
-                        <UpdateServiceForm row={record} onCancelSave={onCancelSave} />
+                        <UpdateAddonForm row={record} onCancelSave={onCancelSave} />
                     </FormProvider>
                 </Box>
 

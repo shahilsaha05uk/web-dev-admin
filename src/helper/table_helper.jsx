@@ -83,3 +83,12 @@ export function GetSelectedRowsFromTableRef(tableRef) {
 
     return gridApi.getSelectedRows();
 }
+
+export function GetIDsFromSelectedRows(gridApi, col_id) {
+    const data = gridApi.getSelectedRows();
+    const ids = [];
+    data.forEach((row) => {
+        ids.push(row[col_id]);
+    });
+    return ids;
+}
