@@ -7,10 +7,9 @@ import { FormInputText } from 'core_components/form/FormInputText';
 import PanelButton from 'core_components/buttons/PanelButton';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { nanoid } from 'nanoid';
 
 export default function AddServiceForm(props) {
-    // form hooks
+    //#region  Properties
     const methods = useForm();
     const rowToEdit = useSelector((state) => state.addServiceModal.rowToEdit);
 
@@ -22,16 +21,18 @@ export default function AddServiceForm(props) {
     // States
     const [isEditing, setIsEditing] = useState(false);
     const [location, setLocation] = useState(false);
+    //#endregion Properties
 
+    //#region  Button Handlers
     // Handlers
     // This function calls the onAdd method from the props passed and resets the form fields for another entry
-    const handleAdd = (data) => {
+    const handleOnAddButtonClick = (data) => {
         if (onAdd) onAdd(data);
         resetEverything();
     };
 
     // This function will populate the form fields with the data from the row that was clicked and enable the cancel and update button
-    const handleEdit = () => {
+    const handleOnEditButtonClick = () => {
         if (rowToEdit) {
             const data = rowToEdit.data;
             Object.entries(data).forEach(([key, value]) => {
@@ -46,19 +47,19 @@ export default function AddServiceForm(props) {
         }
     };
 
-    const handleDelete = () => {
+    const handleOnDeleteButtonClick = () => {
         if (onDelete) onDelete(rowToEdit);
         resetEverything();
     };
 
     // This function calls the onUpdate method from the props passed and resets the form fields for another entry
-    const handleUpdate = (data) => {
+    const handleOnUpdateButtonClick = (data) => {
         if (onUpdate) onUpdate(data);
         resetEverything();
     };
 
     // This function resets the form fields and disables the cancel and update button
-    const handleCancel = () => {
+    const handleOnCancelButtonClick = () => {
         // Clear out all the fields
         reset();
 
@@ -66,17 +67,22 @@ export default function AddServiceForm(props) {
         // Call the onCancel function
         if (onCancel) onCancel();
     };
+    //#endregion Button Handlers
 
-    const resetEverything = () => {
-        reset();
-        setIsEditing(false);
-    };
-
+    //#region  Event Handlers
     // This function sets the location field in the form
     const OnLocationSet = (location) => {
         setLocation(location);
         setValue('service_city', location.address);
     };
+    //#endregion Event Handlers
+
+    //#region  Utilities
+    const resetEverything = () => {
+        reset();
+        setIsEditing(false);
+    };
+    //#endregion Utilities
 
     return (
         <FormProvider {...methods}>
@@ -90,13 +96,18 @@ export default function AddServiceForm(props) {
 
                     {/* Buttons */}
                     <Box sx={Styles.btnBox}>
-                        <PanelButton name="add" label="Add" onClick={handleSubmit(handleAdd)} disabled={rowToEdit} />
+                        <PanelButton
+                            name="add"
+                            label="Add"
+                            onClick={handleSubmit(handleOnAddButtonClick)}
+                            disabled={rowToEdit}
+                        />
                         <Box sx={Styles.updateBox} pointerEvents="none">
                             <PanelButton
                                 name="edit"
                                 label="Edit"
                                 sx={{ flex: 1 }}
-                                onClick={handleEdit}
+                                onClick={handleOnEditButtonClick}
                                 disabled={!rowToEdit || isEditing}
                             />
                             <PanelButton
@@ -104,7 +115,7 @@ export default function AddServiceForm(props) {
                                 label="Delete"
                                 color="error"
                                 sx={{ flex: 1 }}
-                                onClick={handleDelete}
+                                onClick={handleOnDeleteButtonClick}
                                 disabled={!rowToEdit || isEditing}
                             />
                         </Box>
@@ -113,14 +124,14 @@ export default function AddServiceForm(props) {
                             <PanelButton
                                 name="update"
                                 label="Update"
-                                onClick={handleSubmit(handleUpdate)}
+                                onClick={handleSubmit(handleOnUpdateButtonClick)}
                                 sx={{ flex: 1 }}
                                 disabled={!isEditing}
                             />
                             <PanelButton
                                 name="cancel-update"
                                 label="Cancel Update"
-                                onClick={handleCancel}
+                                onClick={handleOnCancelButtonClick}
                                 sx={{ flex: 1 }}
                                 disabled={!isEditing}
                             />

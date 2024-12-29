@@ -6,6 +6,7 @@ import Home from 'home/Home';
 import Services from 'services/Services';
 import Addon from 'addon/Addon';
 import { ComponentStyles } from 'assets/compStyles';
+import Booking from 'modules/booking/Booking';
 
 const navNum = 2;
 
@@ -23,6 +24,8 @@ function OpenPanel(props) {
         return <Services />;
     } else if (value === 2) {
         return <Addon />;
+    } else if (value === 3) {
+        return <Booking />;
     }
 
     return null;

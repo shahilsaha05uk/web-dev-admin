@@ -1,24 +1,20 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
 import { ComponentStyles } from 'assets/compStyles';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import LocationField from 'core_components/fields/LocationField';
 import { useState, useEffect } from 'react';
 import { FormInputText } from 'core_components/form/FormInputText';
 
 export default function UpdateServiceForm(props) {
+    //#region  Properties
     const methods = useFormContext();
 
-    const { setValue, reset } = methods;
+    const { setValue } = methods;
     const [location, setLocation] = useState(null);
 
-    const { row, onSave, onCancelSave } = props;
-
-    // methods
-    const OnLocationSet = (location) => {
-        setLocation(location);
-        setValue('service_city', location.address);
-    };
+    const { row } = props;
+    //#endregion Properties
 
     useEffect(() => {
         if (row) {
@@ -30,6 +26,11 @@ export default function UpdateServiceForm(props) {
             setValue('service_description', service_description || '');
         }
     }, [row]);
+
+    const OnLocationSet = (location) => {
+        setLocation(location);
+        setValue('service_city', location.address);
+    };
 
     return (
         <Box sx={ComponentStyles.modal.form.main}>

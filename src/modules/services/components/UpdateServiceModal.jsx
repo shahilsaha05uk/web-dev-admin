@@ -9,6 +9,7 @@ import UpdateServiceForm from './UpdateServiceForm';
 import useUpdateServiceDetails from '../hooks/useUpdateServiceDetails';
 
 export default function UpdateServiceModal({ open, onClose, row }) {
+    // Properties
     const methods = useForm();
     const { mutate } = useUpdateServiceDetails();
     const [record, setRecord] = useState(null);
@@ -22,15 +23,17 @@ export default function UpdateServiceModal({ open, onClose, row }) {
         }
     }, [row, setRecord]);
 
-    const onSave = (data) => {
+    // Button Handlers
+    const handleOnSaveButtonClick = (data) => {
         data.service_id = record.service_id;
         mutate(data);
         onClose();
     };
-    const onCancelSave = () => {
+    const handleOnCancelSaveButtonClick = () => {
         setData(null);
         onClose();
     };
+
     return (
         <Modal
             open={open}
@@ -43,13 +46,13 @@ export default function UpdateServiceModal({ open, onClose, row }) {
                 <Box sx={ComponentStyles.modal.content}>
                     {/* The form to handle all the fields in the form */}
                     <FormProvider {...methods}>
-                        <UpdateServiceForm row={record} onCancelSave={onCancelSave} />
+                        <UpdateServiceForm row={record} onCancelSave={handleOnCancelSaveButtonClick} />
                     </FormProvider>
                 </Box>
 
                 {/* Stack to hold the Save button and the Cancel Button */}
                 <Stack direction="row" sx={ModalStyles.btnStack}>
-                    <PanelButton label="Save Changes" onClick={handleSubmit(onSave)} />
+                    <PanelButton label="Save Changes" onClick={handleSubmit(handleOnSaveButtonClick)} />
                     <PanelButton label="Cancel" onClick={onClose} />
                 </Stack>
             </Box>

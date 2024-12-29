@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { Box } from "@mui/material";
-import { ComponentStyles } from "assets/compStyles";
-import { FormProvider, useForm } from "react-hook-form";
-import { FormInputText } from "core_components/form/FormInputText";
-import PanelButton from "core_components/buttons/PanelButton";
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Box } from '@mui/material';
+import { ComponentStyles } from 'assets/compStyles';
+import { FormProvider, useForm } from 'react-hook-form';
+import { FormInputText } from 'core_components/form/FormInputText';
+import PanelButton from 'core_components/buttons/PanelButton';
 
 export default function AddAddonForm(props) {
+    //#region  Properties
     // form hooks
     const methods = useForm();
 
@@ -18,17 +19,19 @@ export default function AddAddonForm(props) {
 
     // States
     const [isEditing, setIsEditing] = useState(false);
+    //#endregion Properties
 
-    // Handlers
+    //#region  Handlers
     // This function calls the onAdd method from the props passed and resets the form fields for another entry
-    const handleAdd = (data) => {
-        //TODO: Add a unique id to the data (temp fix)
+    const handleOnAddButtonClick = (data) => {
         if (onAdd) onAdd(data);
         reset();
     };
+    //#endregion Handlers
 
+    //#region Button Handlers
     // This function will populate the form fields with the data from the row that was clicked and enable the cancel and update button
-    const handleEdit = () => {
+    const handleOnEditButtonClick = () => {
         if (rowToEdit) {
             const data = rowToEdit.data;
             Object.entries(data).forEach(([key, value]) => {
@@ -43,26 +46,28 @@ export default function AddAddonForm(props) {
         }
     };
 
-    const handleDelete = () => {
+    const handleOnDeleteButtonClick = () => {
         if (onDelete) onDelete(rowToEdit);
         reset();
     };
 
     // This function calls the onUpdate method from the props passed and resets the form fields for another entry
-    const handleUpdate = (data) => {
+    const handleOnUpdateButtonClick = (data) => {
         if (onUpdate) onUpdate(data);
         reset();
     };
 
     // This function resets the form fields and disables the cancel and update button
-    const handleCancel = () => {
+    const handleOnCancelButtonClick = () => {
         // Clear out all the fields
         reset();
 
         setIsEditing(false);
+
         // Call the onCancel function
         if (onCancel) onCancel();
     };
+    //#endregion
 
     return (
         <FormProvider {...methods}>
@@ -70,30 +75,25 @@ export default function AddAddonForm(props) {
                 <Box sx={ComponentStyles.modal.form.content}>
                     {/* Form Fields */}
                     <FormInputText name="addon_name" label="Addon Title" />
-                    <FormInputText
-                        name="addon_cost"
-                        label="Price in £0.00"
-                        type="number"
-                    />
-                    <FormInputText
-                        name="addon_description"
-                        label="Description"
-                    />
+                    <FormInputText name="addon_cost" label="Price in £0.00" type="number" />
+                    <FormInputText name="addon_description" label="Description" />
 
                     {/* Buttons */}
                     <Box sx={Styles.btnBox}>
                         <PanelButton
                             name="add"
                             label="Add"
-                            onClick={handleSubmit(handleAdd)}
+                            onClick={handleSubmit(handleOnAddButtonClick)}
                             disabled={rowToEdit}
                         />
+
+                        {/* Edit and Delete Buttons */}
                         <Box sx={Styles.updateBox} pointerEvents="none">
                             <PanelButton
                                 name="edit"
                                 label="Edit"
                                 sx={{ flex: 1 }}
-                                onClick={handleEdit}
+                                onClick={handleOnEditButtonClick}
                                 disabled={!rowToEdit || isEditing}
                             />
                             <PanelButton
@@ -101,23 +101,24 @@ export default function AddAddonForm(props) {
                                 label="Delete"
                                 color="error"
                                 sx={{ flex: 1 }}
-                                onClick={handleDelete}
+                                onClick={handleOnDeleteButtonClick}
                                 disabled={!rowToEdit || isEditing}
                             />
                         </Box>
 
+                        {/* Update and Cancel Update Button */}
                         <Box sx={Styles.updateBox} pointerEvents="none">
                             <PanelButton
                                 name="update"
                                 label="Update"
-                                onClick={handleSubmit(handleUpdate)}
+                                onClick={handleSubmit(handleOnUpdateButtonClick)}
                                 sx={{ flex: 1 }}
                                 disabled={!isEditing}
                             />
                             <PanelButton
                                 name="cancel-update"
                                 label="Cancel Update"
-                                onClick={handleCancel}
+                                onClick={handleOnCancelButtonClick}
                                 sx={{ flex: 1 }}
                                 disabled={!isEditing}
                             />
@@ -131,16 +132,16 @@ export default function AddAddonForm(props) {
 
 const Styles = {
     btnBox: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         gap: 2,
     },
     updateBox: {
-        display: "inline-flex",
-        alignItems: "stretch",
-        flexDirection: "row",
-        justifyContent: "stretch",
+        display: 'inline-flex',
+        alignItems: 'stretch',
+        flexDirection: 'row',
+        justifyContent: 'stretch',
         gap: 2,
     },
 };

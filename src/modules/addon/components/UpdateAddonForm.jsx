@@ -8,8 +8,9 @@ import { FormInputText } from 'core_components/form/FormInputText';
 export default function UpdateAddonForm(props) {
     const methods = useFormContext();
     const { setValue, reset } = methods;
-    const { row, onSave, onCancelSave } = props;
+    const { row } = props;
 
+    // when the row changes, update the form fields
     useEffect(() => {
         if (row) {
             const { addon_name, addon_cost, addon_description } = row;

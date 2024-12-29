@@ -8,12 +8,12 @@ import { ComponentStyles } from 'assets/compStyles';
 import { setRecords, setRowToEdit } from 'services/states/slc_serviceModal';
 import { ServiceSchema } from 'services/schema/service_schema';
 import usePostServiceDetails from 'services/hooks/usePostServiceDetails';
-import { useState } from 'react';
-import { decrementCount, incrementCount } from '../states/slc_serviceModal';
+import { incrementCount } from '../states/slc_serviceModal';
 import { AddRow, DeleteSelectedRow, UpdateSelectedRow, GetAPIFromTableRef, GetRowData } from 'helper/table_helper';
 import { useCallback } from 'react';
 
 export default function AddServiceModal({ open, onClose }) {
+    //#region  Properties
     // This stores all the data in the table
     const tableRef = useRef(null);
     const getRowId = useCallback((params) => String(params.data.table_id), []);
@@ -26,28 +26,30 @@ export default function AddServiceModal({ open, onClose }) {
     const dispatch = useDispatch();
 
     const { mutate } = usePostServiceDetails();
+    //#endregion Properties
 
-    const onAddButtonClick = (record) => {
+    //#region  Button Handlers
+    const handleOnAddButtonClick = (record) => {
         dispatch(incrementCount());
         record.table_id = count;
         AddRow(tableRef, record);
     };
 
-    const onDeleteButtonClick = () => {
+    const handleOnDeleteButtonClick = () => {
         DeleteSelectedRow(tableRef);
         resetSelection();
     };
 
-    const onUpdateButtonClick = (data) => {
+    const handleOnUpdateButtonClick = (data) => {
         UpdateSelectedRow(tableRef, data);
         resetSelection();
     };
 
-    const onCancelUpdateButtonClick = () => {
+    const handleOnCancelUpdateButtonClick = () => {
         resetSelection();
     };
 
-    const onSaveButtonClick = () => {
+    const handleOnSaveButtonClick = () => {
         const data = GetRowData(tableRef);
         mutate(data);
 
@@ -55,11 +57,13 @@ export default function AddServiceModal({ open, onClose }) {
         if (onClose) onClose();
     };
 
-    const handleOnClose = () => {
+    const handleOnCloseButtonClick = () => {
         resetEverything();
         if (onClose) onClose();
     };
+    //#endregion Button Handlers
 
+    //#region Event Handlers
     const handleOnRowClicked = (event) => {
         const { rowIndex, data } = event;
 
@@ -73,7 +77,9 @@ export default function AddServiceModal({ open, onClose }) {
             }
         }
     };
+    //#endregion Event Handlers
 
+    //#region  Utilities
     const resetEverything = () => {
         resetSelection();
         dispatch(setRecords([]));
@@ -87,6 +93,7 @@ export default function AddServiceModal({ open, onClose }) {
             gridApi.deselectAll();
         }
     };
+    //#endregion Utilities
 
     return (
         <Modal
@@ -109,19 +116,19 @@ export default function AddServiceModal({ open, onClose }) {
                     />
                     {/* The form to handle all the fields in the form */}
                     <AddServiceForm
-                        onAdd={onAddButtonClick}
-                        onSave={onSaveButtonClick}
-                        onCancel={onCancelUpdateButtonClick}
-                        onUpdate={onUpdateButtonClick}
-                        onDelete={onDeleteButtonClick}
+                        onAdd={handleOnAddButtonClick}
+                        onSave={handleOnSaveButtonClick}
+                        onCancel={handleOnCancelUpdateButtonClick}
+                        onUpdate={handleOnUpdateButtonClick}
+                        onDelete={handleOnDeleteButtonClick}
                         rowToEdit={rowToEdit}
                     />
                 </Box>
 
                 {/* Stack to hold the Save button and the Cancel Button */}
                 <Stack direction="row" sx={ModalStyles.btnStack}>
-                    <PanelButton label="Save Changes" onClick={onSaveButtonClick} />
-                    <PanelButton label="Close" onClick={handleOnClose} />
+                    <PanelButton label="Save Changes" onClick={handleOnSaveButtonClick} />
+                    <PanelButton label="Close" onClick={handleOnCloseButtonClick} />
                 </Stack>
             </Box>
         </Modal>

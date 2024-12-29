@@ -15,6 +15,7 @@ export default function UpdateAddonModal({ open, onClose, row }) {
 
     const { handleSubmit } = methods;
 
+    // Set the record to the form fields
     useEffect(() => {
         if (row && row.length > 0) {
             setRecord(row[0]);
@@ -22,16 +23,19 @@ export default function UpdateAddonModal({ open, onClose, row }) {
         }
     }, [row, setRecord]);
 
-    const onSave = (data) => {
+    //#region  Button Handlers
+    const handleOnSaveButtonClick = (data) => {
         data.addon_id = record.addon_id;
         console.log('data', data);
         mutate(data);
         onClose();
     };
-    const onCancelSave = () => {
+    const handleOnCancelSaveButtonClick = () => {
         setData(null);
         onClose();
     };
+    //#endregion Button Handlers
+
     return (
         <Modal
             open={open}
@@ -44,13 +48,13 @@ export default function UpdateAddonModal({ open, onClose, row }) {
                 <Box sx={ComponentStyles.modal.content}>
                     {/* The form to handle all the fields in the form */}
                     <FormProvider {...methods}>
-                        <UpdateAddonForm row={record} onCancelSave={onCancelSave} />
+                        <UpdateAddonForm row={record} onCancelSave={handleOnCancelSaveButtonClick} />
                     </FormProvider>
                 </Box>
 
                 {/* Stack to hold the Save button and the Cancel Button */}
                 <Stack direction="row" sx={ModalStyles.btnStack}>
-                    <PanelButton label="Save Changes" onClick={handleSubmit(onSave)} />
+                    <PanelButton label="Save Changes" onClick={handleSubmit(handleOnSaveButtonClick)} />
                     <PanelButton label="Cancel" onClick={onClose} />
                 </Stack>
             </Box>
