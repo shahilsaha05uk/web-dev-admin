@@ -1,26 +1,22 @@
-export function AddRow(tableRef, data) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function AddRow(gridApi, data) {
     if (!gridApi) return;
 
     return gridApi.applyTransaction({ add: [data] });
 }
 
-export function AddRows(tableRef, data) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function AddRows(gridApi, data) {
     if (!gridApi) return;
 
     return gridApi.applyTransaction({ add: data });
 }
 
-export function UpdateSelectedRow(tableRef, data) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function UpdateSelectedRow(gridApi, data) {
     if (!gridApi) return;
 
     gridApi.applyTransaction({ update: [data] });
 }
 
-export function DeleteSelectedRow(tableRef) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function DeleteSelectedRow(gridApi) {
     if (!gridApi) return;
 
     const selectedRows = gridApi.getSelectedRows();
@@ -28,20 +24,18 @@ export function DeleteSelectedRow(tableRef) {
     gridApi.applyTransaction({ remove: selectedRows });
 }
 
-export function ClearTable(tableRef) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function ClearTable(gridApi) {
     if (!gridApi) return;
 
-    const rows = GetRowData(tableRef);
+    const rows = GetRowData(gridApi);
     gridApi.applyTransaction({ remove: rows });
 }
 
-export function RefreshTable(tableRef, data = []) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function RefreshTable(gridApi, data = []) {
     if (!gridApi) return;
 
-    ClearTable(tableRef);
-    AddRows(tableRef, data);
+    ClearTable(gridApi);
+    AddRows(gridApi, data);
 }
 
 export function isSameRow(row1, row2) {
@@ -58,8 +52,7 @@ export function GetAPIFromTableRef(tableRef) {
     return gridApi || null;
 }
 
-export function GetRowData(tableRef) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function GetRowData(gridApi) {
     if (!gridApi) return [];
 
     const rowData = [];
@@ -70,15 +63,13 @@ export function GetRowData(tableRef) {
     return rowData;
 }
 
-export function GetRowDataFromSelectedRows(tableRef) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function GetRowDataFromSelectedRows(gridApi) {
     if (!gridApi) return [];
 
     return gridApi.getSelectedRows();
 }
 
-export function GetSelectedRowsFromTableRef(tableRef) {
-    const gridApi = GetAPIFromTableRef(tableRef);
+export function GetSelectedRowsFromTableRef(gridApi) {
     if (!gridApi) return [];
 
     return gridApi.getSelectedRows();

@@ -127,7 +127,7 @@ export default function AddAddonModal({ open, onClose }) {
 
     // Save Data to Redux
     const saveData = (id) => {
-        const tableData = GetRowData(tableRef);
+        const tableData = GetRowData(gridApi);
         if (tableData.length > 0) {
             dispatch(addRecords({ serviceId: id, newRecords: tableData }));
         }
@@ -143,7 +143,7 @@ export default function AddAddonModal({ open, onClose }) {
     return (
         <Modal
             open={open}
-            onClose={handleOnClose}
+            onClose={handleOnCloseButtonClick}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >

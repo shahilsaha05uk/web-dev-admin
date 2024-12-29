@@ -32,7 +32,6 @@ export default function Services() {
     const dispatch = useDispatch();
 
     // States and refs
-    const tableRef = useRef(null);
     const [currentModal, setCurrentModal] = useState(null);
     const [gridApi, setGridApi] = useState(null);
     const { data, isLoading, isError, error } = useFetchAllServices();
@@ -40,10 +39,10 @@ export default function Services() {
     //#endregion Properties
 
     useEffect(() => {
-        if (data && tableRef) {
-            RefreshTable(tableRef, data);
+        if (data && gridApi) {
+            RefreshTable(gridApi, data);
         }
-    }, [data, tableRef]);
+    }, [data, gridApi]);
 
     //#region  Button Handlers
     // When the multi-select button is clicked, it will enable the multi-row selection mode
@@ -72,7 +71,7 @@ export default function Services() {
     // When the delete button is clicked, it will delete the selected rows
     const handleOnDeleteButtonClick = () => {
         const ids = GetIDsFromSelectedRows(gridApi, 'service_id');
-        DeleteSelectedRow(tableRef);
+        DeleteSelectedRow(gridApi);
 
         if (ids.length > 0) {
             console.log('Deleting rows with IDs:', ids);
@@ -104,7 +103,7 @@ export default function Services() {
     };
 
     const handleOnGridReady = (params) => {
-        AddRows(tableRef, data);
+        AddRows(gridApi, data);
         setGridApi(params.api);
     };
     //#endregion Event Handlers
@@ -165,7 +164,6 @@ export default function Services() {
                 {/* Main Table */}
                 <Box sx={ComponentStyles.pageTable}>
                     <DGTable
-                        ref={tableRef}
                         cols={ServiceSchema.main}
                         rows={records}
                         pagination

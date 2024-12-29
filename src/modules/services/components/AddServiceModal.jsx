@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { Box, Modal, Stack } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import DGTable from 'core_components/tables/DGTable';
@@ -9,13 +9,13 @@ import { setRecords, setRowToEdit } from 'services/states/slc_serviceModal';
 import { ServiceSchema } from 'services/schema/service_schema';
 import usePostServiceDetails from 'services/hooks/usePostServiceDetails';
 import { incrementCount } from '../states/slc_serviceModal';
-import { AddRow, DeleteSelectedRow, UpdateSelectedRow, GetAPIFromTableRef, GetRowData } from 'helper/table_helper';
-import { useCallback } from 'react';
+import { AddRow, DeleteSelectedRow, UpdateSelectedRow, GetRowData } from 'helper/table_helper';
 
 export default function AddServiceModal({ open, onClose }) {
     //#region  Properties
     // This stores all the data in the table
     const tableRef = useRef(null);
+    const [gridApi, setGridApi] = useState(null);
     const getRowId = useCallback((params) => String(params.data.table_id), []);
 
     const records = useSelector((state) => state.addServiceModal.records);
@@ -32,16 +32,16 @@ export default function AddServiceModal({ open, onClose }) {
     const handleOnAddButtonClick = (record) => {
         dispatch(incrementCount());
         record.table_id = count;
-        AddRow(tableRef, record);
+        AddRow(gridApi, record);
     };
 
     const handleOnDeleteButtonClick = () => {
-        DeleteSelectedRow(tableRef);
+        DeleteSelectedRow(gridApi);
         resetSelection();
     };
 
     const handleOnUpdateButtonClick = (data) => {
-        UpdateSelectedRow(tableRef, data);
+        UpdateSelectedRow(gridApi, data);
         resetSelection();
     };
 
@@ -50,7 +50,7 @@ export default function AddServiceModal({ open, onClose }) {
     };
 
     const handleOnSaveButtonClick = () => {
-        const data = GetRowData(tableRef);
+        const data = GetRowData(gridApi);
         mutate(data);
 
         resetEverything();
@@ -64,6 +64,11 @@ export default function AddServiceModal({ open, onClose }) {
     //#endregion Button Handlers
 
     //#region Event Handlers
+
+    const handleOnGridReady = (params) => {
+        setGridApi(params.api);
+    };
+
     const handleOnRowClicked = (event) => {
         const { rowIndex, data } = event;
 
@@ -87,8 +92,6 @@ export default function AddServiceModal({ open, onClose }) {
 
     const resetSelection = () => {
         dispatch(setRowToEdit(null));
-
-        const gridApi = GetAPIFromTableRef(tableRef);
         if (gridApi) {
             gridApi.deselectAll();
         }
@@ -112,6 +115,7 @@ export default function AddServiceModal({ open, onClose }) {
                         rows={records}
                         getRowId={getRowId}
                         rowSelection={rowSelectionConfig}
+                        onGridReady={handleOnGridReady}
                         onRowClicked={handleOnRowClicked}
                     />
                     {/* The form to handle all the fields in the form */}
