@@ -43,7 +43,6 @@ export default function Navbar() {
                     <Tab label="Home"></Tab>
                     <Tab label="Services"></Tab>
                     <Tab label="Addons"></Tab>
-                    <Tab label="Bookings"></Tab>
                 </Tabs>
             </Box>
             {/* Panel */}

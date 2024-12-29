@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { Box, Modal, Stack } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import DGTable from 'core_components/tables/DGTable';
@@ -8,14 +8,14 @@ import { ComponentStyles } from 'assets/compStyles';
 import { setRecords, setRowToEdit } from 'services/states/slc_serviceModal';
 import { ServiceSchema } from 'services/schema/service_schema';
 import usePostServiceDetails from 'services/hooks/usePostServiceDetails';
-import { useState } from 'react';
-import { decrementCount, incrementCount } from '../states/slc_serviceModal';
-import { AddRow, DeleteSelectedRow, UpdateSelectedRow, GetAPIFromTableRef, GetRowData } from 'helper/table_helper';
-import { useCallback } from 'react';
+import { incrementCount } from '../states/slc_serviceModal';
+import { AddRow, DeleteSelectedRow, UpdateSelectedRow, GetRowData } from 'helper/table_helper';
 
 export default function AddServiceModal({ open, onClose }) {
+    //#region  Properties
     // This stores all the data in the table
     const tableRef = useRef(null);
+    const [gridApi, setGridApi] = useState(null);
     const getRowId = useCallback((params) => String(params.data.table_id), []);
 
     const records = useSelector((state) => state.addServiceModal.records);
@@ -26,38 +26,47 @@ export default function AddServiceModal({ open, onClose }) {
     const dispatch = useDispatch();
 
     const { mutate } = usePostServiceDetails();
+    //#endregion Properties
 
-    const onAddButtonClick = (record) => {
+    //#region  Button Handlers
+    const handleOnAddButtonClick = (record) => {
         dispatch(incrementCount());
         record.table_id = count;
-        AddRow(tableRef, record);
+        AddRow(gridApi, record);
     };
 
-    const onDeleteButtonClick = () => {
-        DeleteSelectedRow(tableRef);
+    const handleOnDeleteButtonClick = () => {
+        DeleteSelectedRow(gridApi);
         resetSelection();
     };
 
-    const onUpdateButtonClick = (data) => {
-        UpdateSelectedRow(tableRef, data);
+    const handleOnUpdateButtonClick = (data) => {
+        UpdateSelectedRow(gridApi, data);
         resetSelection();
     };
 
-    const onCancelUpdateButtonClick = () => {
+    const handleOnCancelUpdateButtonClick = () => {
         resetSelection();
     };
 
-    const onSaveButtonClick = () => {
-        const data = GetRowData(tableRef);
+    const handleOnSaveButtonClick = () => {
+        const data = GetRowData(gridApi);
         mutate(data);
 
         resetEverything();
         if (onClose) onClose();
     };
 
-    const handleOnClose = () => {
+    const handleOnCloseButtonClick = () => {
         resetEverything();
         if (onClose) onClose();
+    };
+    //#endregion Button Handlers
+
+    //#region Event Handlers
+
+    const handleOnGridReady = (params) => {
+        setGridApi(params.api);
     };
 
     const handleOnRowClicked = (event) => {
@@ -73,7 +82,9 @@ export default function AddServiceModal({ open, onClose }) {
             }
         }
     };
+    //#endregion Event Handlers
 
+    //#region  Utilities
     const resetEverything = () => {
         resetSelection();
         dispatch(setRecords([]));
@@ -81,12 +92,11 @@ export default function AddServiceModal({ open, onClose }) {
 
     const resetSelection = () => {
         dispatch(setRowToEdit(null));
-
-        const gridApi = GetAPIFromTableRef(tableRef);
         if (gridApi) {
             gridApi.deselectAll();
         }
     };
+    //#endregion Utilities
 
     return (
         <Modal
@@ -105,23 +115,24 @@ export default function AddServiceModal({ open, onClose }) {
                         rows={records}
                         getRowId={getRowId}
                         rowSelection={rowSelectionConfig}
+                        onGridReady={handleOnGridReady}
                         onRowClicked={handleOnRowClicked}
                     />
                     {/* The form to handle all the fields in the form */}
                     <AddServiceForm
-                        onAdd={onAddButtonClick}
-                        onSave={onSaveButtonClick}
-                        onCancel={onCancelUpdateButtonClick}
-                        onUpdate={onUpdateButtonClick}
-                        onDelete={onDeleteButtonClick}
+                        onAdd={handleOnAddButtonClick}
+                        onSave={handleOnSaveButtonClick}
+                        onCancel={handleOnCancelUpdateButtonClick}
+                        onUpdate={handleOnUpdateButtonClick}
+                        onDelete={handleOnDeleteButtonClick}
                         rowToEdit={rowToEdit}
                     />
                 </Box>
 
                 {/* Stack to hold the Save button and the Cancel Button */}
                 <Stack direction="row" sx={ModalStyles.btnStack}>
-                    <PanelButton label="Save Changes" onClick={onSaveButtonClick} />
-                    <PanelButton label="Close" onClick={handleOnClose} />
+                    <PanelButton label="Save Changes" onClick={handleOnSaveButtonClick} />
+                    <PanelButton label="Close" onClick={handleOnCloseButtonClick} />
                 </Stack>
             </Box>
         </Modal>

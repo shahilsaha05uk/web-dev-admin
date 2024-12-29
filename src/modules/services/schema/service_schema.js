@@ -34,6 +34,13 @@ export const ServiceSchema = {
             cellEditor: 'agTextCellEditor',
             flex: 1,
         },
+        {
+            field: 'service_city',
+            headerName: 'City',
+            editable: true,
+            cellEditor: 'agTextCellEditor',
+            flex: 1,
+        },
     ],
     modal: [
         {

@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
-import { store } from './modules/core/states/store.jsx';
+import { store } from './store.jsx';
 import ErrorHandler from './modules/core/components/misc/ErrorHandler.jsx';
 import App from './App.jsx';
 

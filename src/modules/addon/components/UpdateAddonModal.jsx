@@ -5,17 +5,17 @@ import { FormProvider, useForm } from 'react-hook-form';
 import PanelButton from 'core_components/buttons/PanelButton';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import UpdateServiceForm from './UpdateServiceForm';
-import useUpdateServiceDetails from '../hooks/useUpdateServiceDetails';
+import useUpdateAddonDetails from '../hooks/useUpdateAddonDetails';
+import UpdateAddonForm from './UpdateAddonForm';
 
-export default function UpdateServiceModal({ open, onClose, row }) {
-    // Properties
+export default function UpdateAddonModal({ open, onClose, row }) {
     const methods = useForm();
-    const { mutate } = useUpdateServiceDetails();
+    const { mutate } = useUpdateAddonDetails();
     const [record, setRecord] = useState(null);
 
     const { handleSubmit } = methods;
 
+    // Set the record to the form fields
     useEffect(() => {
         if (row && row.length > 0) {
             setRecord(row[0]);
@@ -23,9 +23,10 @@ export default function UpdateServiceModal({ open, onClose, row }) {
         }
     }, [row, setRecord]);
 
-    // Button Handlers
+    //#region  Button Handlers
     const handleOnSaveButtonClick = (data) => {
-        data.service_id = record.service_id;
+        data.addon_id = record.addon_id;
+        console.log('data', data);
         mutate(data);
         onClose();
     };
@@ -33,6 +34,7 @@ export default function UpdateServiceModal({ open, onClose, row }) {
         setData(null);
         onClose();
     };
+    //#endregion Button Handlers
 
     return (
         <Modal
@@ -46,7 +48,7 @@ export default function UpdateServiceModal({ open, onClose, row }) {
                 <Box sx={ComponentStyles.modal.content}>
                     {/* The form to handle all the fields in the form */}
                     <FormProvider {...methods}>
-                        <UpdateServiceForm row={record} onCancelSave={handleOnCancelSaveButtonClick} />
+                        <UpdateAddonForm row={record} onCancelSave={handleOnCancelSaveButtonClick} />
                     </FormProvider>
                 </Box>
 

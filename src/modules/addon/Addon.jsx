@@ -1,39 +1,37 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { Box } from "@mui/material";
+import { Box } from '@mui/material';
 
-import BasePanel from "core_components/panels/BasePanel";
-import PanelButton from "core_components/buttons/PanelButton";
-import { ComponentStyles } from "assets/compStyles";
-import DGTable from "core_components/tables/DGTable";
-import LoadingRadial from "core_components/misc/LoadingRadial";
-import ErrorScreen from "core_components/misc/ErrorScreen";
-import {
-    GetAPIFromTableRef,
-    GetSelectedRowsFromTableRef,
-} from "helper/table_helper";
-import {
-    setRecords,
-    setRowSelectionConfig,
-    setSelectedRowCount,
-} from "addon/states/slc_addons";
-import { AddonSchema } from "addon/schema/addon_schema";
-import { useFetchAllAddons } from "api/fetch/useFetchAllAddons";
-import useDeleteAddonDetails from "api/post/useDeleteAddonDetails";
-import AddAddonModal from "addon/components/AddAddonModal";
+// Core components
+import BasePanel from 'core_components/panels/BasePanel';
+import PanelButton from 'core_components/buttons/PanelButton';
+import { ComponentStyles } from 'assets/compStyles';
+import DGTable from 'core_components/tables/DGTable';
+import LoadingRadial from 'core_components/misc/LoadingRadial';
+import ErrorScreen from 'core_components/misc/ErrorScreen';
+
+// Helper Classes
+import { GetIDsFromSelectedRows, GetSelectedRowsFromTableRef } from 'helper/table_helper';
+
+// Addon Components
+import { setRecords, setRowSelectionConfig, setSelectedRowCount } from 'addon/states/slc_addons';
+import { AddonSchema } from 'addon/schema/addon_schema';
+import AddAddonModal from 'addon/components/AddAddonModal';
+
+// API calls
+import { useFetchAllAddons } from 'api/fetch/useFetchAllAddons';
+import UpdateAddonModal from './components/UpdateAddonModal';
+import useDeleteAddonDetails from 'modules/addon/hooks/useDeleteAddonDetails';
 
 export default function Addon() {
-    const rowSelectionConfig = useSelector(
-        (state) => state.addon.rowSelectionConfig,
-    );
+    const rowSelectionConfig = useSelector((state) => state.addon.rowSelectionConfig);
     const records = useSelector((state) => state.addon.records);
-    const selectedRowCount = useSelector(
-        (state) => state.addon.selectedRowCount,
-    );
+    const selectedRowCount = useSelector((state) => state.addon.selectedRowCount);
     const dispatch = useDispatch();
 
     const tableRef = useRef(null);
+    const [gridApi, setGridApi] = useState(null);
     const [currentModal, setCurrentModal] = useState(null);
     const { data, isLoading, isError, error } = useFetchAllAddons();
     const { mutate } = useDeleteAddonDetails();
@@ -43,7 +41,7 @@ export default function Addon() {
         dispatch(
             setRowSelectionConfig({
                 ...rowSelectionConfig,
-                mode: "multiRow",
+                mode: 'multiRow',
             }),
         );
     };
@@ -54,46 +52,53 @@ export default function Addon() {
         dispatch(
             setRowSelectionConfig({
                 ...rowSelectionConfig,
-                mode: "singleRow",
+                mode: 'singleRow',
             }),
         );
     };
 
     const handleOnDeleteButtonClick = () => {
-        const selectedRows = GetSelectedRowsFromTableRef(tableRef);
-        if (selectedRows && selectedRows.length > 0) {
-            const ids = selectedRows.map((row) => row.id);
-            console.log("Deleting rows with IDs:", ids);
-
-            mutate(ids); // Pass only IDs to the delete mutation
-            resetSelection(); // Clear selection after deletion
+        if (gridApi) {
+            const ids = GetIDsFromSelectedRows(gridApi, 'addon_id');
+            console.log('Deleting IDs:', ids);
+            mutate(ids);
+            resetEverything();
         }
+    };
+
+    const resetEverything = () => {
+        resetSelection();
+
+        dispatch(
+            setRowSelectionConfig({
+                ...rowSelectionConfig,
+                mode: 'singleRow',
+            }),
+        );
     };
 
     const resetSelection = () => {
         dispatch(setSelectedRowCount(0));
 
-        const gridApi = GetAPIFromTableRef(tableRef);
         if (gridApi) {
             gridApi.deselectAll();
         }
-
-        console.log("Selection count:", selectedRowCount);
     };
-
     const handleOnModalClose = () => {
         setCurrentModal(null);
     };
 
     const handleOnRowClicked = () => {
-        const gridApi = GetAPIFromTableRef(tableRef);
-
         if (gridApi) {
             const count = gridApi.getSelectedRows().length;
             dispatch(setSelectedRowCount(count));
         }
 
-        console.log("Selection count:", selectedRowCount);
+        console.log('Selection count:', selectedRowCount);
+    };
+
+    const handleOnGridReady = (params) => {
+        setGridApi(params.api);
     };
 
     useEffect(() => {
@@ -108,14 +113,10 @@ export default function Addon() {
             <div>
                 <h1>Addons</h1>
                 {/* Buttons to open modals */}
-                <PanelButton
-                    label="Add"
-                    onClick={() => setCurrentModal("add")}
-                    sx={ComponentStyles.panelButton}
-                />
+                <PanelButton label="Add" onClick={() => setCurrentModal('add')} sx={ComponentStyles.panelButton} />
                 <PanelButton
                     label="Update"
-                    onClick={() => setCurrentModal("update")}
+                    onClick={() => setCurrentModal('update')}
                     sx={ComponentStyles.panelButton}
                     disabled={selectedRowCount !== 1}
                 />
@@ -123,13 +124,13 @@ export default function Addon() {
                     label="Multi-Select"
                     onClick={handleOnMultiSelectButtonClick}
                     sx={ComponentStyles.panelButton}
-                    disabled={rowSelectionConfig.mode === "multiRow"}
+                    disabled={rowSelectionConfig.mode === 'multiRow'}
                 />
                 <PanelButton
                     label="Cancel Multi-Select"
                     onClick={handleOnCancelMultiSelectButtonClick}
                     sx={ComponentStyles.panelButton}
-                    disabled={rowSelectionConfig.mode === "singleRow"}
+                    disabled={rowSelectionConfig.mode === 'singleRow'}
                 />
                 <PanelButton
                     label="Delete"
@@ -148,23 +149,21 @@ export default function Addon() {
                         paginationPageSizeSelector={[10, 20, 30, 100]}
                         paginationPageSize={10}
                         rowSelection={rowSelectionConfig}
+                        onGridReady={handleOnGridReady}
                         onRowClicked={handleOnRowClicked}
                         onRowSelected={handleOnRowClicked}
                     />
                 </Box>
 
                 {/* Modals */}
-                {currentModal === "add" && (
-                    <AddAddonModal open onClose={() => handleOnModalClose()} />
-                )}
-                {currentModal === "update" &&
-                    {
-                        /* <UpdateModal
+                {currentModal === 'add' && <AddAddonModal open onClose={() => handleOnModalClose()} />}
+                {currentModal === 'update' && (
+                    <UpdateAddonModal
                         open
                         onClose={() => handleOnModalClose()}
                         row={GetSelectedRowsFromTableRef(tableRef)}
-                    /> */
-                    }}
+                    />
+                )}
             </div>
         </BasePanel>
     );

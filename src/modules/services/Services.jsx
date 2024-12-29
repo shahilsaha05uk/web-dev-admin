@@ -1,34 +1,51 @@
-import React, { useEffect } from 'react';
-import BasePanel from 'core_components/panels/BasePanel';
-import PanelButton from 'core_components/buttons/PanelButton';
-import { ComponentStyles } from 'assets/compStyles';
-import { useFetchAllServices } from 'api/fetch/useFetchAllServices';
-import { useState } from 'react';
-import { Box } from '@mui/material';
-import DGTable from 'core_components/tables/DGTable';
-import LoadingRadial from 'core_components/misc/LoadingRadial';
-import ErrorScreen from 'core_components/misc/ErrorScreen';
-import { useRef } from 'react';
-import { DeleteSelectedRow, GetAPIFromTableRef, GetSelectedRowsFromTableRef, RefreshTable } from 'helper/table_helper';
+import React, { useEffect, useState, useRef } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
+import { Box } from '@mui/material';
+
+import DGTable from 'core_components/tables/DGTable';
+import BasePanel from 'core_components/panels/BasePanel';
+import ErrorScreen from 'core_components/misc/ErrorScreen';
+import PanelButton from 'core_components/buttons/PanelButton';
+import LoadingRadial from 'core_components/misc/LoadingRadial';
+
+import { AddRows, DeleteSelectedRow, GetIDsFromSelectedRows, RefreshTable } from 'helper/table_helper';
+
+import { ComponentStyles } from 'assets/compStyles';
+
 import { setRowSelectionConfig, setSelectedRowCount } from 'services/states/slc_services';
 import { ServiceSchema } from 'services/schema/service_schema';
 import AddServiceModal from 'services/components/AddServiceModal';
-import { AddRows } from 'helper/table_helper';
+
+import { useFetchAllServices } from 'api/fetch/useFetchAllServices';
+
 import useDeleteServiceDetails from './hooks/useDeleteServiceDetails';
-import { GetPermanentIDsFromSelectedRows } from './utils/serviceHelper';
+import UpdateServiceModal from './components/UpdateServiceModal';
 
 export default function Services() {
+    //#region  Properties
+
+    // Redux selectors
     const rowSelectionConfig = useSelector((state) => state.service.rowSelectionConfig);
     const records = useSelector((state) => state.service.records);
     const selectedRowCount = useSelector((state) => state.service.selectedRowCount);
     const dispatch = useDispatch();
 
-    const tableRef = useRef(null);
+    // States and refs
     const [currentModal, setCurrentModal] = useState(null);
+    const [gridApi, setGridApi] = useState(null);
     const { data, isLoading, isError, error } = useFetchAllServices();
     const { mutate } = useDeleteServiceDetails();
+    //#endregion Properties
 
+    useEffect(() => {
+        if (data && gridApi) {
+            RefreshTable(gridApi, data);
+        }
+    }, [data, gridApi]);
+
+    //#region  Button Handlers
+    // When the multi-select button is clicked, it will enable the multi-row selection mode
     const handleOnMultiSelectButtonClick = () => {
         resetSelection();
         dispatch(
@@ -39,6 +56,7 @@ export default function Services() {
         );
     };
 
+    // When the cancel multi-select button is clicked, it will reset the selection to single-row mode
     const handleOnCancelMultiSelectButtonClick = () => {
         resetSelection();
 
@@ -50,9 +68,10 @@ export default function Services() {
         );
     };
 
+    // When the delete button is clicked, it will delete the selected rows
     const handleOnDeleteButtonClick = () => {
-        const ids = GetPermanentIDsFromSelectedRows(tableRef);
-        DeleteSelectedRow(tableRef);
+        const ids = GetIDsFromSelectedRows(gridApi, 'service_id');
+        DeleteSelectedRow(gridApi);
 
         if (ids.length > 0) {
             console.log('Deleting rows with IDs:', ids);
@@ -60,46 +79,53 @@ export default function Services() {
             resetSelection(); // Clear selection after deletion
         }
     };
+    //#endregion Button Handlers
 
-    const resetSelection = () => {
-        dispatch(setSelectedRowCount(0));
+    //#region  Event Handlers
 
-        const gridApi = GetAPIFromTableRef(tableRef);
-        if (gridApi) {
-            gridApi.deselectAll();
-        }
-
-        console.log('Selection count:', selectedRowCount);
-    };
-
+    // Modal Handlers
     const handleOnModalClose = () => {
         setCurrentModal(null);
+        resetSelection();
     };
 
-    const handleOnRowClicked = () => {
-        const gridApi = GetAPIFromTableRef(tableRef);
+    const handleOnModalOpen = (modal) => {
+        dispatch(setRowSelectionConfig({ ...rowSelectionConfig, mode: 'singleRow' }));
+        setCurrentModal(modal);
+    };
 
+    // Grid Handlers
+    const handleOnRowClicked = () => {
         if (gridApi) {
             const count = gridApi.getSelectedRows().length;
             dispatch(setSelectedRowCount(count));
         }
     };
 
-    const handleOnTableReady = () => {
-        AddRows(tableRef, data);
+    const handleOnGridReady = (params) => {
+        AddRows(gridApi, data);
+        setGridApi(params.api);
     };
+    //#endregion Event Handlers
 
-    const handleOnModalOpen = (modal) => {
-        resetSelection();
-        dispatch(setRowSelectionConfig({ ...rowSelectionConfig, mode: 'singleRow' }));
-        setCurrentModal(modal);
-    };
-
-    useEffect(() => {
-        if (data && tableRef) {
-            RefreshTable(tableRef, data);
+    //#region  Utilities
+    const getSelectedRows = () => {
+        if (gridApi) {
+            const selectedRows = gridApi.getSelectedRows();
+            console.log('Selected Rows:', selectedRows);
+            return selectedRows;
         }
-    }, [data, tableRef]);
+    };
+
+    // Reset the selection count to 0
+    const resetSelection = () => {
+        dispatch(setSelectedRowCount(0));
+
+        if (gridApi) {
+            gridApi.deselectAll();
+        }
+    };
+    //#endregion Utilities
 
     if (isLoading) return <LoadingRadial />;
     if (isError) return <ErrorScreen error={error} />;
@@ -138,13 +164,12 @@ export default function Services() {
                 {/* Main Table */}
                 <Box sx={ComponentStyles.pageTable}>
                     <DGTable
-                        ref={tableRef}
                         cols={ServiceSchema.main}
                         rows={records}
                         pagination
                         paginationPageSizeSelector={[10, 20, 30, 100]}
                         paginationPageSize={10}
-                        onGridReady={handleOnTableReady}
+                        onGridReady={handleOnGridReady}
                         rowSelection={rowSelectionConfig}
                         onRowClicked={handleOnRowClicked}
                         onRowSelected={handleOnRowClicked}
@@ -154,7 +179,7 @@ export default function Services() {
                 {/* Modals */}
                 {currentModal === 'add' && <AddServiceModal open onClose={() => handleOnModalClose()} />}
                 {currentModal === 'update' && (
-                    <Update open onClose={() => handleOnModalClose()} row={GetSelectedRowsFromTableRef(tableRef)} />
+                    <UpdateServiceModal open onClose={() => handleOnModalClose()} row={getSelectedRows()} />
                 )}
             </div>
         </BasePanel>

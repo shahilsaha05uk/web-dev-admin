@@ -32,7 +32,6 @@ export const api_routes = {
     searchBy: '/api/searchby',
 
     // update data
-    updateService: '/api/service/update',
 
     // login data
     postLoginDetails: '/api/auth',
@@ -44,10 +43,12 @@ export const api_routes = {
     allServiceIDs: '/api/db/service/pk/all',
     allServices: '/api/db/service/all',
     addService: '/api/db/service/add',
+    updateService: '/api/db/service/update',
     deleteService: '/api/db/service/delete',
 
     // addon data
     allAddons: '/api/db/addon/all',
     addAddon: '/api/db/addon/add',
     deleteAddon: '/api/db/addon/delete',
+    updateAddon: '/api/db/addon/update',
 };
