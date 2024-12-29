@@ -126,6 +126,7 @@ export default function AddAddonModal({ open, onClose }) {
 
     // Handle Save Button Click
     const handleSave = () => {
+        console.log('Records:', records);
         mutate(records);
         resetEverything();
         if (onClose) onClose();
