@@ -7,19 +7,6 @@
 			- Uses the / prefix
 			- Used for rendering the pages with/without data
 */
-export const page_routes = {
-    // pages
-    home: '/home',
-    about: '/about',
-    search: '/search',
-    details: '/details',
-    review: '/review',
-    restaurant: '/restaurant',
-
-    // search results page
-    searchAll: '/search/all',
-    searchByCity: '/search/city',
-};
 
 export const api_routes = {
     // sorted restaurant data

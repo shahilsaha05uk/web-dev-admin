@@ -18,12 +18,13 @@ export default function UpdateServiceForm(props) {
 
     useEffect(() => {
         if (row) {
-            const { service_name, service_cost, service_city, service_description } = row;
+            const { service_name, service_cost, service_city, service_description, service_image } = row;
 
             setValue('service_name', service_name || '');
             setValue('service_cost', service_cost || '');
             setValue('service_city', service_city || '');
             setValue('service_description', service_description || '');
+            setValue('service_image', service_image || '');
         }
     }, [row]);
 
@@ -40,6 +41,7 @@ export default function UpdateServiceForm(props) {
                 <FormInputText name="service_cost" label="Cost" />
                 <LocationField name="service_city" label="City" onPlaceSelect={OnLocationSet} isFormField={true} />
                 <FormInputText name="service_description" label="Description" />
+                <FormInputText name="service_image" label="Image URL" />
             </Box>
         </Box>
     );

@@ -41,6 +41,13 @@ export const ServiceSchema = {
             cellEditor: 'agTextCellEditor',
             flex: 1,
         },
+        {
+            field: 'service_image',
+            headerName: 'Image URL',
+            editable: true,
+            cellEditor: 'agTextCellEditor',
+            flex: 1,
+        },
     ],
     modal: [
         {
@@ -64,6 +71,12 @@ export const ServiceSchema = {
             field: 'service_cost',
             headerName: 'Price',
             valueFormatter: (p) => '£' + p.value,
+            editable: true,
+            flex: 1,
+        },
+        {
+            field: 'service_image',
+            headerName: 'Image URL',
             editable: true,
             flex: 1,
         },

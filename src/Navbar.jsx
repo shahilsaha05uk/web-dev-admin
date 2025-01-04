@@ -7,7 +7,7 @@ import Services from 'services/Services';
 import Addon from 'addon/Addon';
 import { ComponentStyles } from 'assets/compStyles';
 
-const navNum = 2;
+const navNum = 1;
 
 const styles = {
     panel: {

@@ -93,6 +93,7 @@ export default function AddServiceForm(props) {
                     <FormInputText name="service_cost" label="Price in £0.00" type="number" defaultValue={0} />
                     <LocationField name="service_city" label="City" onPlaceSelect={OnLocationSet} isFormField={true} />
                     <FormInputText name="service_description" label="Description" />
+                    <FormInputText name="service_image" label="Image URL" />
 
                     {/* Buttons */}
                     <Box sx={Styles.btnBox}>
